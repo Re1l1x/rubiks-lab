@@ -14,7 +14,7 @@ const GltfModel = () => {
             0.1,
             1000
         );
-        camera.position.set(12, 8, 12);
+        camera.position.set(7, 5, 7);
         camera.lookAt(new THREE.Vector3(0, 0, 0));
         const renderer = new THREE.WebGLRenderer({ antialias: true });
 
@@ -23,7 +23,7 @@ const GltfModel = () => {
 
         const loader = new GLTFLoader();
         loader.load(
-            "/models/Cube.glb",
+            "/models/Cube2.glb",
             (gltf) => {
                 scene.add(gltf.scene);
                 animate();

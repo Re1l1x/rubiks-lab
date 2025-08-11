@@ -18,6 +18,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "prettier": "^3.6.2",
+    "stylelint": "^16.23.1",
+    "stylelint-order": "^6.0.4",
+    "stylelint-prettier": "^5.0.3",
     "typescript": "^5"
   }
 }

@@ -1,0 +1,36 @@
+.button {
+    height: 40px;
+    min-width: 160px;
+    padding: 0 17px;
+
+    font-size: inherit;
+    font-size: 18px;
+    font-weight: 700;
+
+    color: var(--black);
+    background-color: var(--accent);
+    border: none;
+    border-radius: 15px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.button:disabled {
+    cursor: default;
+    filter: brightness(0.5);
+
+    transition: 0.3s;
+}
+
+.button:not([disabled]):hover {
+    box-shadow: 0 0 15px var(--accent);
+
+    transition: 0.3s;
+}
+
+.button:not([disabled]):active {
+    transition: 0.1s;
+    transform: scale(0.95);
+}
