@@ -7,13 +7,16 @@
     --button-secondary-hover: #f2f2f2;
 
     display: grid;
-    grid-template-rows: 20px 1fr 20px;
     align-items: center;
-    justify-items: center;
+
     min-height: 100svh;
     padding: 80px;
     gap: 64px;
+
     font-family: var(--font-geist-sans);
+
+    grid-template-rows: 20px 1fr 20px;
+    justify-items: center;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,16 +33,20 @@
 .main {
     display: flex;
     flex-direction: column;
+
     gap: 32px;
+
     grid-row-start: 2;
 }
 
 .main ol {
-    font-family: var(--font-geist-mono);
-    padding-left: 0;
     margin: 0;
+    padding-left: 0;
+
+    font-family: var(--font-geist-mono);
     font-size: 14px;
     line-height: 24px;
+
     letter-spacing: -0.01em;
     list-style-position: inside;
 }
@@ -49,54 +56,71 @@
 }
 
 .main code {
-    font-family: inherit;
-    background: var(--gray-alpha-100);
     padding: 2px 4px;
-    border-radius: 4px;
+
+    font-family: inherit;
     font-weight: 600;
+
+    background: var(--gray-alpha-100);
+    border-radius: 4px;
 }
 
 .ctas {
     display: flex;
+
     gap: 16px;
 }
 
 .ctas a {
-    appearance: none;
-    border-radius: 128px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     height: 48px;
     padding: 0 20px;
-    border: 1px solid transparent;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
     font-size: 16px;
-    line-height: 20px;
     font-weight: 500;
+    line-height: 20px;
+
+    border: 1px solid transparent;
+    border-radius: 128px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s,
+        color 0.2s,
+        border-color 0.2s;
+
+    appearance: none;
 }
 
 a.primary {
-    background: var(--foreground);
-    color: var(--background);
     gap: 8px;
+
+    color: var(--background);
+    background: var(--foreground);
 }
 
 a.secondary {
-    border-color: var(--gray-alpha-200);
     min-width: 158px;
+
+    border-color: var(--gray-alpha-200);
 }
 
 .footer {
-    grid-row-start: 3;
     display: flex;
+
     gap: 24px;
+
+    grid-row-start: 3;
 }
 
 .footer a {
     display: flex;
     align-items: center;
+
     gap: 8px;
 }
 
@@ -108,11 +132,13 @@ a.secondary {
 @media (hover: hover) and (pointer: fine) {
     a.primary:hover {
         background: var(--button-primary-hover);
+
         border-color: transparent;
     }
 
     a.secondary:hover {
         background: var(--button-secondary-hover);
+
         border-color: transparent;
     }
 
@@ -141,9 +167,10 @@ a.secondary {
     }
 
     .ctas a {
-        font-size: 14px;
         height: 40px;
         padding: 0 16px;
+
+        font-size: 14px;
     }
 
     a.secondary {
@@ -152,8 +179,8 @@ a.secondary {
 
     .footer {
         flex-wrap: wrap;
-        align-items: center;
         justify-content: center;
+        align-items: center;
     }
 }
 

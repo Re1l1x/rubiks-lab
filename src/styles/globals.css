@@ -1,0 +1,32 @@
+:root {
+    --accent: var(--sexy-blue);
+    --dark-accent: var(--dark-green);
+
+    --black: #09090b;
+    --dark-gray: #18181b;
+    --gray: #27272a;
+    --light-gray: #434343;
+    --dark-white: #9198a1;
+    --white: #fafafa;
+
+    --lime: #bdf500;
+    --green: #7bff78;
+    --dark-green: #315a31;
+    --blue: #366efe;
+    --sexy-blue: #58d8c9;
+    --dark-sexy-blue: #286a62;
+    --red: #ef5d5d;
+
+    --string: var(--accent);
+    --gym: var(--red);
+    --swimming-pool: var(--sexy-blue);
+    --run: var(--green);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    display: block;
+}
