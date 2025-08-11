@@ -21,36 +21,26 @@ const RubikCube = () => {
 
     const rotateCubeSide = (cubeSide: string, clockwiseDirection: boolean) => {
         if (rubikCubeSceneRef.current) {
-            // rubikCubeSceneRef.current.rotateObjectsAroundCenter(
-            //     cubeSide,
-            //     clockwiseDirection
-            // );
-        }
-    };
-
-    const rotateCubez = () => {
-        if (rubikCubeSceneRef.current) {
-            rubikCubeSceneRef.current.rotateObjectsAroundCenter("z");
-        }
-    };
-
-    const rotateCubex = () => {
-        if (rubikCubeSceneRef.current) {
-            rubikCubeSceneRef.current.rotateObjectsAroundCenter("x");
-        }
-    };
-
-    const rotateCubey = () => {
-        if (rubikCubeSceneRef.current) {
-            rubikCubeSceneRef.current.rotateObjectsAroundCenter("y");
+            rubikCubeSceneRef.current.cubeInteraction(cubeSide, clockwiseDirection);
         }
     };
 
     return (
         <div>
-            <Button label={"z"} onClick={rotateCubez} />
-            <Button label={"x"} onClick={rotateCubex} />
-            <Button label={"y"} onClick={rotateCubey} />
+            <div>clockwise</div>
+            <Button label={"x"} onClick={() => rotateCubeSide("x", true)} />
+            <Button label={"-x"} onClick={() => rotateCubeSide("-x", true)} />
+            <Button label={"y"} onClick={() => rotateCubeSide("y", true)} />
+            <Button label={"-y"} onClick={() => rotateCubeSide("-y", true)} />
+            <Button label={"z"} onClick={() => rotateCubeSide("z", true)} />
+            <Button label={"-z"} onClick={() => rotateCubeSide("-z", true)} />
+            <div>counterclockwise</div>
+            <Button label={"x"} onClick={() => rotateCubeSide("x", false)} />
+            <Button label={"-x"} onClick={() => rotateCubeSide("-x", false)} />
+            <Button label={"y"} onClick={() => rotateCubeSide("y", false)} />
+            <Button label={"-y"} onClick={() => rotateCubeSide("-y", false)} />
+            <Button label={"z"} onClick={() => rotateCubeSide("z", false)} />
+            <Button label={"-z"} onClick={() => rotateCubeSide("-z", false)} />
         </div>
     );
 };

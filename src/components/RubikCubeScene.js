@@ -23,7 +23,7 @@ class RubikCubeScene {
 
         this.scene.background = new THREE.Color(0x7e7e7e);
 
-        this.camera.position.set(7, 5, 7);
+        this.camera.position.set(5, 3, 5);
         this.camera.lookAt(0, 0, 0);
 
         this.loadCube();
@@ -35,14 +35,13 @@ class RubikCubeScene {
             this.renderer.domElement
         );
 
-        this.cubeControls = new RubikCubeController();
-
-        this.this.clock = new THREE.Clock();
+        this.clock = new THREE.Clock();
     }
 
     loadCube() {
         this.cubeElements = [];
-        this.mainElement;
+        this.mainCubeElement;
+
         this.mixer;
         this.animations = [];
         this.animationDuration;
@@ -55,8 +54,11 @@ class RubikCubeScene {
                 this.scene.add(this.cube);
 
                 gltf.scene.traverse((object) => {
-                    console.log(object);
-                    this.cubeElements.push(object);
+                    if (object.name == "Center") {
+                        this.mainCubeElement = object;
+                    } else {
+                        this.cubeElements.push(object);
+                    }
                 });
 
                 this.mixer = new THREE.AnimationMixer(this.cube);
@@ -72,6 +74,14 @@ class RubikCubeScene {
                 } else {
                     console.log("Нет анимаций в загруженной модели.");
                 }
+
+                this.cubeControls = new RubikCubeController(
+                    this.scene,
+                    this.cubeElements,
+                    this.mainCubeElement,
+                    this.animations,
+                    this.animationDuration
+                );
             },
             undefined,
             (error) => {
@@ -97,126 +107,8 @@ class RubikCubeScene {
         }
     }
 
-    rotateObjectsAroundCenter(napr) {
-        const objects = this.findObjectsInRange(napr);
-        const mainCube = this.findMainCube()[0];
-        const angle = Math.PI / 2;
-        // console.log(objects);
-        // console.log(mainCube);
-
-        objects.forEach((element) => {
-            mainCube.attach(element);
-        });
-
-        if (napr == "z") {
-            this.animations[2].play();
-            setTimeout(() => {
-                console.log("Анимация завершена!");
-                objects.forEach((element) => {
-                    this.scene.attach(element);
-                });
-                this.animations[2].stop();
-            }, this.animationDuration * 1000);
-        }
-        if (napr == "x") {
-            this.animations[0].play();
-            setTimeout(() => {
-                console.log("Анимация завершена!");
-                objects.forEach((element) => {
-                    this.scene.attach(element);
-                });
-                this.animations[0].stop();
-            }, this.animationDuration * 1000);
-            // mainCube.rotateX(Math.PI / 2);
-            // objects.forEach((element) => {
-            //     this.scene.attach(element);
-            // });
-        }
-        if (napr == "y") {
-            this.animations[1].play();
-            setTimeout(() => {
-                console.log("Анимация завершена!");
-                objects.forEach((element) => {
-                    this.scene.attach(element);
-                });
-                this.animations[1].stop();
-            }, this.animationDuration * 1000);
-            // mainCube.rotateY(Math.PI / 2);
-            // objects.forEach((element) => {
-            //     this.scene.attach(element);
-            // });
-        }
-
-        // if (napr == "z") {
-        //     mainCube.rotateZ(-Math.PI / 2);
-        // }
-        // if (napr == "x") {
-        //     mainCube.rotateX(-Math.PI / 2);
-        // }
-        // if (napr == "y") {
-        //     mainCube.rotateY(-Math.PI / 2);
-        // }
-
-        // if (objects.length === 0) return;
-
-        // // Шаг 1: Вычисление общего центра
-        // const center = new THREE.Vector3();
-        // objects.forEach((object) => {
-        //     center.add(object.position);
-        // });
-        // center.divideScalar(objects.length);
-
-        // objects.forEach((object) => {
-        //     object.position.sub(center);
-        // });
-
-        // const quaternion = new THREE.Quaternion();
-        // quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
-        // objects.forEach((object) => {
-        //     object.quaternion.multiplyQuaternions(
-        //         quaternion,
-        //         object.quaternion
-        //     );
-        // });
-
-        // objects.forEach((object) => {
-        //     object.position.add(center);
-        // });
-    }
-
-    findMainCube() {
-        const selectedObjects = [];
-        this.cubeElements.forEach((object) => {
-            if (object.isMesh) {
-                const position = object.position;
-                if (position.x == 0 && position.y == 0 && position.z == 0) {
-                    selectedObjects.push(object);
-                }
-            }
-        });
-
-        return selectedObjects;
-    }
-
-    findObjectsInRange(napr) {
-        const selectedObjects = [];
-
-        this.cubeElements.forEach((object) => {
-            if (object.isMesh) {
-                const position = object.position;
-                if (napr == "z" && position.z >= 0.5) {
-                    selectedObjects.push(object);
-                }
-                if (napr == "x" && position.x >= 0.5) {
-                    selectedObjects.push(object);
-                }
-                if (napr == "y" && position.y >= 0.5) {
-                    selectedObjects.push(object);
-                }
-            }
-        });
-
-        return selectedObjects;
+    cubeInteraction(cubeSide, clockwiseDirection) {
+        this.cubeControls.rotateSide(cubeSide, clockwiseDirection);
     }
 }
 
