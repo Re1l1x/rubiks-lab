@@ -5,7 +5,7 @@ import styles from "./Button.module.css";
 interface Props {
     className?: string;
     label?: string;
-    onClick?: () => void;
+    onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
     disabled?: boolean;
 }
 
