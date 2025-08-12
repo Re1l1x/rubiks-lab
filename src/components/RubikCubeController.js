@@ -5,24 +5,30 @@ class RubikCubeController {
         this.mainCubeElement = mainCubeElement;
         this.animations = animations;
         this.animationDuration = animationDuration;
+        this.isAnimating = false;
     }
 
     rotateSide(cubeSide, clockwiseDirection) {
-        const cubeSideElements = this.findCubeSideElements(cubeSide);
-        const animation = this.findAnimation(cubeSide, clockwiseDirection);
+        if (!this.isAnimating) {
+            this.isAnimating = true;
 
-        cubeSideElements.forEach((element) => {
-            this.mainCubeElement.attach(element);
-        });
+            const cubeSideElements = this.findCubeSideElements(cubeSide);
+            const animation = this.findAnimation(cubeSide, clockwiseDirection);
 
-        animation.play();
-        setTimeout(() => {
-            // console.log("Анимация завершена!");
             cubeSideElements.forEach((element) => {
-                this.scene.attach(element);
+                this.mainCubeElement.attach(element);
             });
-            animation.stop();
-        }, this.animationDuration * 1000);
+
+            animation.play();
+            setTimeout(() => {
+                // console.log("Анимация завершена!");
+                cubeSideElements.forEach((element) => {
+                    this.scene.attach(element);
+                });
+                animation.stop();
+                this.isAnimating = false;
+            }, this.animationDuration * 500);
+        }
     }
 
     findCubeSideElements(direction) {

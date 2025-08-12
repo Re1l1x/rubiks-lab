@@ -103,7 +103,7 @@ class RubikCubeScene {
         this.sceneControls.update();
         this.renderer.render(this.scene, this.camera);
         if (this.mixer) {
-            this.mixer.update(this.clock.getDelta());
+            this.mixer.update(this.clock.getDelta() * 2);
         }
     }
 
