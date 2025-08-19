@@ -25,6 +25,12 @@ const RubikCube = () => {
         }
     };
 
+    const scramble = () => {
+        if (rubikCubeSceneRef.current) {
+            rubikCubeSceneRef.current.scramble();
+        }
+    };
+
     return (
         <div>
             <div>clockwise</div>
@@ -41,6 +47,8 @@ const RubikCube = () => {
             <Button label={"-y"} onClick={() => rotateCubeSide("-y", false)} />
             <Button label={"z"} onClick={() => rotateCubeSide("z", false)} />
             <Button label={"-z"} onClick={() => rotateCubeSide("-z", false)} />
+            <div>scramble</div>
+            <Button label={"scramble"} onClick={() => scramble()} />
         </div>
     );
 };

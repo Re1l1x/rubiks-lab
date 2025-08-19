@@ -8,6 +8,27 @@ class RubikCubeController {
         this.isAnimating = false;
     }
 
+    scramble() {
+        let cubeSides = ["x", "-x", "y", "-y", "z", "-z"];
+        let clockwiseDirections = [true, false];
+
+        for (let i = 0; i < 30; i++) {
+            setTimeout(
+                () => {
+                    let cubeSideNum = this.getRandomInt(0, 5);
+                    let clockwiseDirectionNum = this.getRandomInt(0, 1);
+                    console.log(i);
+                    this.rotateSide(cubeSides[cubeSideNum], clockwiseDirections[clockwiseDirectionNum]);
+                },
+                this.animationDuration * 500 * i
+            );
+        }
+    }
+
+    getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     rotateSide(cubeSide, clockwiseDirection) {
         if (!this.isAnimating) {
             this.isAnimating = true;

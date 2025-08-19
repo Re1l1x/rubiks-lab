@@ -448,6 +448,10 @@ class RubikCubeScene {
     cubeInteraction(cubeSide, clockwiseDirection) {
         this.cubeControls.rotateSide(cubeSide, clockwiseDirection);
     }
+
+    scramble() {
+        this.cubeControls.scramble();
+    }
 }
 
 export default RubikCubeScene;
