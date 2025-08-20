@@ -6,6 +6,11 @@ class RubikCubeController {
         this.animations = animations;
         this.animationDuration = animationDuration;
         this.isAnimating = false;
+
+        this.targetRotation = 0;
+        this.currentRotation = 0;
+        this.rotationSpeed = Math.PI / 60;
+        this.cubeSide = "";
     }
 
     scramble() {
@@ -17,10 +22,9 @@ class RubikCubeController {
                 () => {
                     let cubeSideNum = this.getRandomInt(0, 5);
                     let clockwiseDirectionNum = this.getRandomInt(0, 1);
-                    console.log(i);
                     this.rotateSide(cubeSides[cubeSideNum], clockwiseDirections[clockwiseDirectionNum]);
                 },
-                this.animationDuration * 500 * i
+                this.animationDuration * 600 * i
             );
         }
     }
@@ -31,24 +35,58 @@ class RubikCubeController {
 
     rotateSide(cubeSide, clockwiseDirection) {
         if (!this.isAnimating) {
-            this.isAnimating = true;
+            this.cubeSide = cubeSide;
 
             const cubeSideElements = this.findCubeSideElements(cubeSide);
-            const animation = this.findAnimation(cubeSide, clockwiseDirection);
-
             cubeSideElements.forEach((element) => {
                 this.mainCubeElement.attach(element);
             });
+            this.targetRotation = Math.PI / 2;
 
-            animation.play();
-            setTimeout(() => {
-                // console.log("Анимация завершена!");
-                cubeSideElements.forEach((element) => {
+            this.isAnimating = true;
+        }
+
+        // if (!this.isAnimating) {
+        //     this.isAnimating = true;
+
+        //     const cubeSideElements = this.findCubeSideElements(cubeSide);
+        //     const animation = this.findAnimation(cubeSide, clockwiseDirection);
+
+        //     cubeSideElements.forEach((element) => {
+        //         this.mainCubeElement.attach(element);
+        //     });
+
+        //     animation.play();
+        //     setTimeout(() => {
+        //         // console.log("Анимация завершена!");
+        //         cubeSideElements.forEach((element) => {
+        //             this.scene.attach(element);
+        //         });
+        //         animation.stop();
+        //         this.isAnimating = false;
+        //     }, this.animationDuration * 500);
+        // }
+    }
+
+    animate() {
+        if (this.isAnimating) {
+            if (Math.abs(this.currentRotation - this.targetRotation) > 0.01) {
+                this.currentRotation += this.rotationSpeed;
+                if (this.cubeSide.includes("x")) {
+                    this.mainCubeElement.rotation.x = this.currentRotation;
+                } else if (this.cubeSide.includes("y")) {
+                    this.mainCubeElement.rotation.y = this.currentRotation;
+                } else if (this.cubeSide.includes("z")) {
+                    this.mainCubeElement.rotation.z = this.currentRotation;
+                }
+            } else {
+                this.cubeElements.forEach((element) => {
                     this.scene.attach(element);
                 });
-                animation.stop();
+                this.mainCubeElement.rotation.set(0, 0, 0);
+                this.currentRotation = 0;
                 this.isAnimating = false;
-            }, this.animationDuration * 500);
+            }
         }
     }
 

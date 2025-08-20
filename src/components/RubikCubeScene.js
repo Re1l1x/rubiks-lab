@@ -9,7 +9,7 @@ class RubikCubeScene {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.raycaster = new THREE.Raycaster();
-        this.clock = new THREE.Clock();
+        // this.clock = new THREE.Clock();
 
         this.init();
     }
@@ -49,6 +49,7 @@ class RubikCubeScene {
         this.endPoint;
 
         this.lastMousePosition = new THREE.Vector2(0, 0);
+        this.cubeSideElements = [];
     }
 
     onMouseDown(event) {
@@ -88,6 +89,7 @@ class RubikCubeScene {
                         }
 
                         const cubeSideElements = this.findCubeSideElements();
+                        this.cubeSideElements = cubeSideElements;
 
                         cubeSideElements.forEach((element) => {
                             this.centralCubeElement.attach(element);
@@ -146,22 +148,22 @@ class RubikCubeScene {
                 this.con += dotProduct;
 
                 if (this.rotationAxis == "x") {
-                    this.centralCubeElement.rotation.x += dotProduct * 5;
+                    this.centralCubeElement.rotation.x += dotProduct * 7;
                 }
                 if (this.rotationAxis == "y") {
-                    this.centralCubeElement.rotation.y += dotProduct * 5;
+                    this.centralCubeElement.rotation.y += dotProduct * 7;
                 }
                 if (this.rotationAxis == "z") {
-                    this.centralCubeElement.rotation.z += dotProduct * 5;
+                    this.centralCubeElement.rotation.z += dotProduct * 7;
                 }
                 if (this.rotationAxis == "-x") {
-                    this.centralCubeElement.rotation.x += -dotProduct * 5;
+                    this.centralCubeElement.rotation.x += -dotProduct * 7;
                 }
                 if (this.rotationAxis == "-y") {
-                    this.centralCubeElement.rotation.y += -dotProduct * 5;
+                    this.centralCubeElement.rotation.y += -dotProduct * 7;
                 }
                 if (this.rotationAxis == "-z") {
-                    this.centralCubeElement.rotation.z += -dotProduct * 5;
+                    this.centralCubeElement.rotation.z += -dotProduct * 7;
                 }
             }
         }
@@ -178,7 +180,7 @@ class RubikCubeScene {
             this.centralCubeElement.rotation.z = this.findClosestNumber(this.centralCubeElement.rotation.z);
         }
 
-        this.cubies.forEach((element) => {
+        this.cubeSideElements.forEach((element) => {
             this.scene.attach(element);
         });
 
@@ -192,7 +194,6 @@ class RubikCubeScene {
 
     findClosestNumber(input) {
         input = ((input % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-        console.log(input);
         const numbers = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2, 2 * Math.PI];
 
         let closestNumber = numbers[0];
@@ -277,9 +278,12 @@ class RubikCubeScene {
     render() {
         this.sceneControls.update();
         this.renderer.render(this.scene, this.camera);
-        if (this.mixer) {
-            this.mixer.update(this.clock.getDelta() * 2);
+        if (this.cubeControls) {
+            this.cubeControls.animate();
         }
+        // if (this.mixer) {
+        //     this.mixer.update(this.clock.getDelta() * 2);
+        // }
     }
 
     getMouseIntersections(event) {
