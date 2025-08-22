@@ -25,6 +25,7 @@ class RubikCubeScene {
         this.camera.lookAt(0, 0, 0);
 
         this.loadCube();
+        this.addClickbox();
         this.addLights();
 
         this.sceneControls = new SceneController(this.camera, this.renderer, this.renderer.domElement);
@@ -92,6 +93,14 @@ class RubikCubeScene {
                 console.error("Ошибка загрузки модели:", error);
             }
         );
+    }
+
+    addClickbox() {
+        const geometry = new THREE.BoxGeometry(3.02, 3.02, 3.02);
+        const material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
+        this.clickbox = new THREE.Mesh(geometry, material);
+        this.clickbox.position.set(0, 0, 0);
+        this.scene.add(this.clickbox);
     }
 
     addLights() {
@@ -213,7 +222,7 @@ class RubikCubeScene {
         this.updateScreenMousePosition(event);
 
         this.raycaster.setFromCamera(this.screenMousePosition, this.camera);
-        return this.raycaster.intersectObjects(this.cubies);
+        return this.raycaster.intersectObjects([this.clickbox]);
     }
 
     getDominantDirection(vector) {
