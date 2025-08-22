@@ -34,6 +34,11 @@ class RubikCubeScene {
         this.renderer.domElement.addEventListener("mousemove", this.onMouseMove.bind(this));
         this.renderer.domElement.addEventListener("mouseup", this.onMouseUp.bind(this));
 
+        window.addEventListener("keydown", this.handleKeyDown);
+        window.addEventListener("keyup", this.handleKeyUp);
+
+        this.isShiftPressed = false;
+
         this.rect = this.renderer.domElement.getBoundingClientRect();
 
         this.screenMousePosition = new THREE.Vector2();
@@ -205,6 +210,18 @@ class RubikCubeScene {
         this.sceneControls.controls.enabled = true;
     }
 
+    handleKeyDown = (event) => {
+        if (event.key === "Shift") {
+            this.isShiftPressed = true;
+        }
+    };
+
+    handleKeyUp = (event) => {
+        if (event.key === "Shift") {
+            this.isShiftPressed = false;
+        }
+    };
+
     render() {
         this.sceneControls.update();
         this.renderer.render(this.scene, this.camera);
@@ -296,7 +313,10 @@ class RubikCubeScene {
         this.cubies.forEach((object) => {
             if (object.isMesh) {
                 const position = object.position;
-                if (intervalX(position.x) && intervalY(position.y) && intervalZ(position.z)) {
+                if (
+                    this.isShiftPressed ||
+                    (intervalX(position.x) && intervalY(position.y) && intervalZ(position.z))
+                ) {
                     selectedObjects.push(object);
                 }
             }
