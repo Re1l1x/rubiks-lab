@@ -1,12 +1,10 @@
 class RubikCubeController {
-    constructor(scene, cubeElements, mainCubeElement, animations, animationDuration) {
+    constructor(scene, cubeElements, mainCubeElement) {
         this.scene = scene;
         this.cubeElements = cubeElements;
         this.mainCubeElement = mainCubeElement;
-        this.animations = animations;
-        this.animationDuration = animationDuration;
-        this.isAnimating = false;
 
+        this.isAnimating = false;
         this.targetRotation = 0;
         this.currentRotation = 0;
         this.rotationSpeed = Math.PI / 60;
@@ -45,27 +43,6 @@ class RubikCubeController {
 
             this.isAnimating = true;
         }
-
-        // if (!this.isAnimating) {
-        //     this.isAnimating = true;
-
-        //     const cubeSideElements = this.findCubeSideElements(cubeSide);
-        //     const animation = this.findAnimation(cubeSide, clockwiseDirection);
-
-        //     cubeSideElements.forEach((element) => {
-        //         this.mainCubeElement.attach(element);
-        //     });
-
-        //     animation.play();
-        //     setTimeout(() => {
-        //         // console.log("Анимация завершена!");
-        //         cubeSideElements.forEach((element) => {
-        //             this.scene.attach(element);
-        //         });
-        //         animation.stop();
-        //         this.isAnimating = false;
-        //     }, this.animationDuration * 500);
-        // }
     }
 
     animate() {

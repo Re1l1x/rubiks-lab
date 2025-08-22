@@ -9,7 +9,8 @@ class RubikCubeScene {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.raycaster = new THREE.Raycaster();
-        // this.clock = new THREE.Clock();
+
+        this.sensitivity = 7;
 
         this.init();
     }
@@ -36,28 +37,78 @@ class RubikCubeScene {
 
         this.screenMousePosition = new THREE.Vector2();
 
+        // prettier-ignore
+        this.vectors = {
+            "-x": new THREE.Vector3(-1, 0, 0),
+            "x": new THREE.Vector3(1, 0, 0),
+            "-y": new THREE.Vector3(0, -1, 0),
+            "y": new THREE.Vector3(0, 1, 0),
+            "-z": new THREE.Vector3(0, 0, -1),
+            "z": new THREE.Vector3(0, 0, 1),
+        };
+
         this.isGrabbing = false;
         this.isDragging = false;
 
         this.startPoint2D;
         this.startPoint3D;
+        this.endPoint2D;
+        this.endPoint3D;
 
-        this.direction2;
-        this.direction3;
+        this.moveVector2D;
+        this.moveVector3D;
 
         this.rotationAxis;
-        this.endPoint;
 
-        this.lastMousePosition = new THREE.Vector2(0, 0);
         this.cubeSideElements = [];
+    }
+
+    loadCube() {
+        this.centralCubeElement;
+        this.cubies = [];
+        this.stickers = [];
+
+        const loader = new GLTFLoader();
+        loader.load(
+            "/models/RubikCube.glb",
+            (gltf) => {
+                this.cube = gltf.scene;
+                this.scene.add(this.cube);
+
+                gltf.scene.traverse((object) => {
+                    if (object.name == "Center") {
+                        this.centralCubeElement = object;
+                    } else if (object.name.includes("Sticker")) {
+                        this.stickers.push(object);
+                    } else {
+                        this.cubies.push(object);
+                    }
+                });
+
+                this.cubeControls = new RubikCubeController(this.scene, this.cubies, this.centralCubeElement);
+            },
+            undefined,
+            (error) => {
+                console.error("Ошибка загрузки модели:", error);
+            }
+        );
+    }
+
+    addLights() {
+        const ambientLight = new THREE.AmbientLight(0xffffff, 5);
+        this.scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
+        directionalLight.position.set(1, 1, 1).normalize();
+        this.scene.add(directionalLight);
     }
 
     onMouseDown(event) {
         const intersects = this.getMouseIntersections(event);
 
         if (intersects.length > 0) {
-            this.startPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
             this.startPoint3D = intersects[0].point;
+            this.startPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
 
             this.sceneControls.controls.enabled = false;
             this.isGrabbing = true;
@@ -74,122 +125,109 @@ class RubikCubeScene {
                     const intersects = this.getMouseIntersections(event);
 
                     if (intersects.length > 0) {
-                        const moveVector = intersects[0].point.clone().sub(this.startPoint3D).normalize();
+                        this.endPoint3D = intersects[0].point.clone();
+                        this.moveVector3D =
+                            this.vectors[this.getDominantDirection(this.endPoint3D.sub(this.startPoint3D))];
 
-                        const absX = Math.abs(moveVector.x);
-                        const absY = Math.abs(moveVector.y);
-                        const absZ = Math.abs(moveVector.z);
+                        this.endPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
+                        const projection = this.moveVector3D.clone().project(this.camera);
+                        this.moveVector2D = new THREE.Vector2(projection.x, projection.y).normalize();
 
-                        if (absX >= absY && absX >= absZ) {
-                            this.direction3 = "x";
-                        } else if (absY >= absX && absY >= absZ) {
-                            this.direction3 = "y";
-                        } else {
-                            this.direction3 = "z";
-                        }
+                        this.rotationAxis =
+                            this.vectors[this.getDominantDirection(this.startPoint3D)].clone();
+                        this.rotationAxis.cross(this.moveVector3D);
 
-                        const cubeSideElements = this.findCubeSideElements();
-                        this.cubeSideElements = cubeSideElements;
-
-                        cubeSideElements.forEach((element) => {
+                        this.cubeSideElements = this.findCubeSideElements();
+                        this.cubeSideElements.forEach((element) => {
                             this.centralCubeElement.attach(element);
                         });
-
-                        let vector;
-                        let vector0 = new THREE.Vector3(0, 0, 0);
-
-                        if (this.direction3 == "x") {
-                            vector = new THREE.Vector3(1, 0, 0);
-                        } else if (this.direction3 == "y") {
-                            vector = new THREE.Vector3(0, 1, 0);
-                        } else if (this.direction3 == "z") {
-                            vector = new THREE.Vector3(0, 0, 1);
-                        }
-                        vector.project(this.camera);
-                        vector0.project(this.camera);
-
-                        const widthHalf = window.innerWidth / 2;
-                        const heightHalf = window.innerHeight / 2;
-
-                        const screenX = vector.x * widthHalf + widthHalf;
-                        const screenY = -(vector.y * heightHalf) + heightHalf;
-
-                        const screenX2 = vector0.x * widthHalf + widthHalf;
-                        const screenY2 = -(vector0.y * heightHalf) + heightHalf;
-
-                        this.direction2 = new THREE.Vector2(
-                            screenX2 - screenX,
-                            screenY - screenY2
-                        ).normalize();
-
-                        this.lastMousePosition = new THREE.Vector2(
-                            this.screenMousePosition.x,
-                            this.screenMousePosition.y
-                        );
 
                         this.isDragging = true;
                     }
                 }
             } else if (this.isDragging) {
-                const rect = this.renderer.domElement.getBoundingClientRect();
-                this.screenMousePosition.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                this.screenMousePosition.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-                const mousePosition = new THREE.Vector2(
-                    this.screenMousePosition.x,
-                    this.screenMousePosition.y
+                this.updateScreenMousePosition(event);
+
+                const dotProduct = this.screenMousePosition
+                    .clone()
+                    .sub(this.endPoint2D)
+                    .dot(this.moveVector2D);
+
+                this.endPoint2D.copy(this.screenMousePosition);
+
+                const axis = Object.keys(this.vectors).find((axis) =>
+                    this.rotationAxis.equals(this.vectors[axis])
                 );
 
-                const movement = mousePosition.clone().sub(this.lastMousePosition);
-
-                const dotProduct = movement.dot(this.direction2);
-
-                this.lastMousePosition.copy(mousePosition);
-
-                this.con += dotProduct;
-
-                if (this.rotationAxis == "x") {
-                    this.centralCubeElement.rotation.x += dotProduct * 7;
-                }
-                if (this.rotationAxis == "y") {
-                    this.centralCubeElement.rotation.y += dotProduct * 7;
-                }
-                if (this.rotationAxis == "z") {
-                    this.centralCubeElement.rotation.z += dotProduct * 7;
-                }
-                if (this.rotationAxis == "-x") {
-                    this.centralCubeElement.rotation.x += -dotProduct * 7;
-                }
-                if (this.rotationAxis == "-y") {
-                    this.centralCubeElement.rotation.y += -dotProduct * 7;
-                }
-                if (this.rotationAxis == "-z") {
-                    this.centralCubeElement.rotation.z += -dotProduct * 7;
-                }
+                this.centralCubeElement.rotation[axis.replace("-", "")] +=
+                    dotProduct * 7 * (axis.includes("-") ? -1 : 1);
             }
         }
     }
 
     onMouseUp() {
-        if (this.rotationAxis == "x" || this.rotationAxis == "-x") {
-            this.centralCubeElement.rotation.x = this.findClosestNumber(this.centralCubeElement.rotation.x);
-        }
-        if (this.rotationAxis == "y" || this.rotationAxis == "-y") {
-            this.centralCubeElement.rotation.y = this.findClosestNumber(this.centralCubeElement.rotation.y);
-        }
-        if (this.rotationAxis == "z" || this.rotationAxis == "-z") {
-            this.centralCubeElement.rotation.z = this.findClosestNumber(this.centralCubeElement.rotation.z);
-        }
+        if (this.isDragging) {
+            if (this.rotationAxis.equals(this.vectors["x"]) || this.rotationAxis.equals(this.vectors["-x"])) {
+                this.centralCubeElement.rotation.x = this.findClosestNumber(
+                    this.centralCubeElement.rotation.x
+                );
+            }
+            if (this.rotationAxis.equals(this.vectors["y"]) || this.rotationAxis.equals(this.vectors["-y"])) {
+                this.centralCubeElement.rotation.y = this.findClosestNumber(
+                    this.centralCubeElement.rotation.y
+                );
+            }
+            if (this.rotationAxis.equals(this.vectors["z"]) || this.rotationAxis.equals(this.vectors["-z"])) {
+                this.centralCubeElement.rotation.z = this.findClosestNumber(
+                    this.centralCubeElement.rotation.z
+                );
+            }
 
-        this.cubeSideElements.forEach((element) => {
-            this.scene.attach(element);
-        });
+            this.cubeSideElements.forEach((element) => {
+                this.scene.attach(element);
+            });
 
-        this.centralCubeElement.rotation.set(0, 0, 0);
+            this.centralCubeElement.rotation.set(0, 0, 0);
+        }
 
         this.isGrabbing = false;
         this.isDragging = false;
 
         this.sceneControls.controls.enabled = true;
+    }
+
+    render() {
+        this.sceneControls.update();
+        this.renderer.render(this.scene, this.camera);
+        if (this.cubeControls) {
+            this.cubeControls.animate();
+        }
+    }
+
+    updateScreenMousePosition(event) {
+        this.screenMousePosition.x = ((event.clientX - this.rect.left) / this.rect.width) * 2 - 1;
+        this.screenMousePosition.y = -((event.clientY - this.rect.top) / this.rect.height) * 2 + 1;
+    }
+
+    getMouseIntersections(event) {
+        this.updateScreenMousePosition(event);
+
+        this.raycaster.setFromCamera(this.screenMousePosition, this.camera);
+        return this.raycaster.intersectObjects(this.cubies);
+    }
+
+    getDominantDirection(vector) {
+        const directions = [
+            { direction: "x", value: Math.abs(vector.x), originalValue: vector.x },
+            { direction: "y", value: Math.abs(vector.y), originalValue: vector.y },
+            { direction: "z", value: Math.abs(vector.z), originalValue: vector.z },
+        ];
+
+        const dominant = directions.reduce((prev, current) => {
+            return prev.value > current.value ? prev : current;
+        });
+
+        return (dominant.originalValue < 0 ? "-" : "") + dominant.direction;
     }
 
     findClosestNumber(input) {
@@ -211,93 +249,6 @@ class RubikCubeScene {
         return closestNumber;
     }
 
-    loadCube() {
-        this.centralCubeElement;
-        this.cubies = [];
-        this.stickers = [];
-
-        this.mixer;
-        this.animations = [];
-        this.animationDuration;
-
-        const loader = new GLTFLoader();
-        loader.load(
-            "/models/RubikCube.glb",
-            (gltf) => {
-                this.cube = gltf.scene;
-                this.scene.add(this.cube);
-
-                gltf.scene.traverse((object) => {
-                    if (object.name == "Center") {
-                        this.centralCubeElement = object;
-                    } else if (object.name.includes("Sticker")) {
-                        this.stickers.push(object);
-                    } else {
-                        this.cubies.push(object);
-                    }
-                });
-
-                this.mixer = new THREE.AnimationMixer(this.cube);
-
-                if (gltf.animations && gltf.animations.length) {
-                    this.animations = gltf.animations.map((clip) => {
-                        this.animationDuration = clip.duration;
-                        const action = this.mixer.clipAction(clip);
-                        action.clampWhenFinished = true;
-                        action.setLoop(THREE.LoopOnce);
-                        return action;
-                    });
-                } else {
-                    console.log("Нет анимаций в загруженной модели.");
-                }
-
-                this.cubeControls = new RubikCubeController(
-                    this.scene,
-                    this.cubies,
-                    this.centralCubeElement,
-                    this.animations,
-                    this.animationDuration
-                );
-            },
-            undefined,
-            (error) => {
-                console.error("Ошибка загрузки модели:", error);
-            }
-        );
-    }
-
-    addLights() {
-        const ambientLight = new THREE.AmbientLight(0xffffff, 5);
-        this.scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 3);
-        directionalLight.position.set(1, 1, 1).normalize();
-        this.scene.add(directionalLight);
-    }
-
-    render() {
-        this.sceneControls.update();
-        this.renderer.render(this.scene, this.camera);
-        if (this.cubeControls) {
-            this.cubeControls.animate();
-        }
-        // if (this.mixer) {
-        //     this.mixer.update(this.clock.getDelta() * 2);
-        // }
-    }
-
-    getMouseIntersections(event) {
-        this.updateScreenMousePosition(event);
-
-        this.raycaster.setFromCamera(this.screenMousePosition, this.camera);
-        return this.raycaster.intersectObjects(this.cubies);
-    }
-
-    updateScreenMousePosition(event) {
-        this.screenMousePosition.x = ((event.clientX - this.rect.left) / this.rect.width) * 2 - 1;
-        this.screenMousePosition.y = -((event.clientY - this.rect.top) / this.rect.height) * 2 + 1;
-    }
-
     findCubeSideElements() {
         const selectedObjects = [];
 
@@ -305,135 +256,33 @@ class RubikCubeScene {
         let intervalY = (y) => true;
         let intervalZ = (z) => true;
 
-        if (this.direction3 == "x") {
-            if (this.startPoint3D.y > 1.5 || this.startPoint3D.y < -1.5) {
-                if (this.startPoint3D.z < -0.5) {
-                    intervalZ = (z) => z < -0.5;
-                } else if (this.startPoint3D.z > 0.5) {
-                    intervalZ = (z) => 0.5 < z;
-                } else {
-                    intervalZ = (z) => -0.5 < z && z < 0.5;
-                }
-                if (this.startPoint3D.y > 1.5) {
-                    this.rotationAxis = "z";
-                } else if (this.startPoint3D.y < -1.5) {
-                    this.rotationAxis = "-z";
-                }
-            } else if (this.startPoint3D.z > 1.5 || this.startPoint3D.z < -1.5) {
-                if (this.startPoint3D.y < -0.5) {
-                    intervalY = (y) => y < -0.5;
-                } else if (this.startPoint3D.y > 0.5) {
-                    intervalY = (y) => 0.5 < y;
-                } else {
-                    intervalY = (y) => -0.5 < y && y < 0.5;
-                }
-                if (this.startPoint3D.z > 1.5) {
-                    this.rotationAxis = "-y";
-                } else if (this.startPoint3D.z < -1.5) {
-                    this.rotationAxis = "y";
-                }
+        if (this.rotationAxis.x != 0) {
+            if (this.startPoint3D.x < -0.5) {
+                intervalX = (x) => x < -0.5;
+            } else if (this.startPoint3D.x > 0.5) {
+                intervalX = (x) => x > 0.5;
+            } else {
+                intervalX = (x) => -0.5 < x && x < 0.5;
             }
         }
-
-        if (this.direction3 == "y") {
-            if (this.startPoint3D.x > 1.5 || this.startPoint3D.x < -1.5) {
-                if (this.startPoint3D.z < -0.5) {
-                    intervalZ = (z) => z < -0.5;
-                } else if (this.startPoint3D.z > 0.5) {
-                    intervalZ = (z) => 0.5 < z;
-                } else {
-                    intervalZ = (z) => -0.5 < z && z < 0.5;
-                }
-                if (this.startPoint3D.x > 1.5) {
-                    this.rotationAxis = "-z";
-                } else if (this.startPoint3D.x < -1.5) {
-                    this.rotationAxis = "z";
-                }
-            } else if (this.startPoint3D.z > 1.5 || this.startPoint3D.z < -1.5) {
-                if (this.startPoint3D.x < -0.5) {
-                    intervalX = (x) => x < -0.5;
-                } else if (this.startPoint3D.x > 0.5) {
-                    intervalX = (x) => 0.5 < x;
-                } else {
-                    intervalX = (x) => -0.5 < x && x < 0.5;
-                }
-                if (this.startPoint3D.z > 1.5) {
-                    this.rotationAxis = "x";
-                } else if (this.startPoint3D.z < -1.5) {
-                    this.rotationAxis = "-x";
-                }
+        if (this.rotationAxis.y != 0) {
+            if (this.startPoint3D.y < -0.5) {
+                intervalY = (y) => y < -0.5;
+            } else if (this.startPoint3D.y > 0.5) {
+                intervalY = (y) => y > 0.5;
+            } else {
+                intervalY = (y) => -0.5 < y && y < 0.5;
             }
         }
-
-        if (this.direction3 == "z") {
-            if (this.startPoint3D.x > 1.5 || this.startPoint3D.x < -1.5) {
-                if (this.startPoint3D.y < -0.5) {
-                    intervalY = (y) => y < -0.5;
-                } else if (this.startPoint3D.y > 0.5) {
-                    intervalY = (y) => 0.5 < y;
-                } else {
-                    intervalY = (y) => -0.5 < y && y < 0.5;
-                }
-                if (this.startPoint3D.x > 1.5) {
-                    this.rotationAxis = "y";
-                } else if (this.startPoint3D.x < -1.5) {
-                    this.rotationAxis = "-y";
-                }
-            } else if (this.startPoint3D.y > 1.5 || this.startPoint3D.y < -1.5) {
-                if (this.startPoint3D.x < -0.5) {
-                    intervalX = (x) => x < -0.5;
-                } else if (this.startPoint3D.x > 0.5) {
-                    intervalX = (x) => 0.5 < x;
-                } else {
-                    intervalX = (x) => -0.5 < x && x < 0.5;
-                }
-                if (this.startPoint3D.y > 1.5) {
-                    this.rotationAxis = "-x";
-                } else if (this.startPoint3D.y < -1.5) {
-                    this.rotationAxis = "x";
-                }
+        if (this.rotationAxis.z != 0) {
+            if (this.startPoint3D.z < -0.5) {
+                intervalZ = (z) => z < -0.5;
+            } else if (this.startPoint3D.z > 0.5) {
+                intervalZ = (z) => z > 0.5;
+            } else {
+                intervalZ = (z) => -0.5 < z && z < 0.5;
             }
         }
-
-        // if (this.direction == "y") {
-        //     if (this.startPoint.y > 1.5 || this.startPoint.y < 1.5) {
-        //         if (this.startPoint.z < -0.5) {
-        //             intervalZ = (z) => z < -0.5;
-        //         } else if (this.startPoint > 0.5) {
-        //             intervalZ = (z) => 0.5 < z;
-        //         } else {
-        //             intervalZ = (z) => z < -0.5 && 0.5 < z;
-        //         }
-        //     }
-        // }
-
-        // if (this.direction == "z") {
-        //     if (this.startPoint.y > 1.5 || this.startPoint.y < 1.5) {
-        //         if (this.startPoint.z < -0.5) {
-        //             intervalZ = (z) => z < -0.5;
-        //         } else if (this.startPoint > 0.5) {
-        //             intervalZ = (z) => 0.5 < z;
-        //         } else {
-        //             intervalZ = (z) => z < -0.5 && 0.5 < z;
-        //         }
-        //     }
-        // }
-
-        // if (point.x < -0.5) {
-        //     intervalX = (x) => x < -0.5;
-        // } else if (point.x > 0.5) {
-        //     intervalX = (x) => 0.5 < x;
-        // } else {
-        //     intervalX = (x) => x < -0.5 && 0.5 < x;
-        // }
-
-        // if (point.y < -0.5) {
-        //     intervalY = (y) => y < -0.5;
-        // } else if (point.y > 0.5) {
-        //     intervalY = (y) => 0.5 < y;
-        // } else {
-        //     intervalY = (y) => y < -0.5 && 0.5 < y;
-        // }
 
         this.cubies.forEach((object) => {
             if (object.isMesh) {
@@ -443,8 +292,6 @@ class RubikCubeScene {
                 }
             }
         });
-
-        console.log(selectedObjects);
 
         return selectedObjects;
     }
