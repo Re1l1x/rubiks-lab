@@ -11,6 +11,7 @@ class RubikCubeScene {
         this.raycaster = new THREE.Raycaster();
 
         this.sensitivity = 7;
+        this.mode = "rotating";
 
         this.init();
     }
@@ -25,6 +26,7 @@ class RubikCubeScene {
         this.camera.lookAt(0, 0, 0);
 
         this.loadCube();
+        this.loadMaterials();
         this.addClickbox();
         this.addLights();
 
@@ -36,8 +38,6 @@ class RubikCubeScene {
 
         window.addEventListener("keydown", this.handleKeyDown);
         window.addEventListener("keyup", this.handleKeyUp);
-
-        this.isShiftPressed = false;
 
         this.rect = this.renderer.domElement.getBoundingClientRect();
 
@@ -53,6 +53,7 @@ class RubikCubeScene {
             "z": new THREE.Vector3(0, 0, 1),
         };
 
+        this.isShiftPressed = false;
         this.isGrabbing = false;
         this.isDragging = false;
 
@@ -67,6 +68,8 @@ class RubikCubeScene {
         this.rotationAxis;
 
         this.cubeSideElements = [];
+
+        this.brushMaterial;
     }
 
     loadCube() {
@@ -100,6 +103,26 @@ class RubikCubeScene {
         );
     }
 
+    loadMaterials() {
+        this.materials = [];
+
+        const loader = new GLTFLoader();
+        loader.load(
+            "/models/Materials.glb",
+            (gltf) => {
+                gltf.scene.traverse((object) => {
+                    if (object.isMesh) {
+                        this.materials[object.material.name] = object.material;
+                    }
+                });
+            },
+            undefined,
+            (error) => {
+                console.error("Ошибка загрузки материалов:", error);
+            }
+        );
+    }
+
     addClickbox() {
         const geometry = new THREE.BoxGeometry(3.02, 3.02, 3.02);
         const material = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
@@ -118,25 +141,35 @@ class RubikCubeScene {
     }
 
     onMouseDown(event) {
-        const intersects = this.getMouseIntersections(event);
+        if (this.mode == "rotating") {
+            const intersects = this.getMouseIntersections(event, this.clickbox);
 
-        if (intersects.length > 0) {
-            this.startPoint3D = intersects[0].point;
-            this.startPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
+            if (intersects.length > 0) {
+                this.startPoint3D = intersects[0].point.clone();
+                this.startPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
 
-            this.sceneControls.controls.enabled = false;
-            this.isGrabbing = true;
+                this.sceneControls.controls.enabled = false;
+                this.isGrabbing = true;
+            }
+        }
+        if (this.mode == "painting") {
+            const intersects = this.getMouseIntersections(event, this.stickers);
+
+            if (intersects.length > 0) {
+                const sticker = intersects[0].object;
+                sticker.material = this.brushMaterial;
+            }
         }
     }
 
     onMouseMove(event) {
-        if (this.isGrabbing && this.centralCubeElement) {
+        if (this.mode == "rotating" && this.isGrabbing && this.centralCubeElement) {
             if (!this.isDragging) {
                 this.updateScreenMousePosition(event);
                 const distance = this.screenMousePosition.distanceTo(this.startPoint2D);
 
                 if (distance > 0.01) {
-                    const intersects = this.getMouseIntersections(event);
+                    const intersects = this.getMouseIntersections(event, this.clickbox);
 
                     if (intersects.length > 0) {
                         this.endPoint3D = intersects[0].point.clone();
@@ -235,11 +268,11 @@ class RubikCubeScene {
         this.screenMousePosition.y = -((event.clientY - this.rect.top) / this.rect.height) * 2 + 1;
     }
 
-    getMouseIntersections(event) {
+    getMouseIntersections(event, target) {
         this.updateScreenMousePosition(event);
 
         this.raycaster.setFromCamera(this.screenMousePosition, this.camera);
-        return this.raycaster.intersectObjects([this.clickbox]);
+        return this.raycaster.intersectObjects(Array.isArray(target) ? target : [target]);
     }
 
     getDominantDirection(vector) {
@@ -325,12 +358,20 @@ class RubikCubeScene {
         return selectedObjects;
     }
 
+    changeMode(mode) {
+        this.mode = mode;
+    }
+
     cubeInteraction(cubeSide, clockwiseDirection) {
         this.cubeControls.rotateSide(cubeSide, clockwiseDirection);
     }
 
     scramble() {
         this.cubeControls.scramble();
+    }
+
+    setBrushColor(color) {
+        this.brushMaterial = this.materials[color];
     }
 }
 
