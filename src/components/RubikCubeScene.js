@@ -30,7 +30,7 @@ class RubikCubeScene {
         this.addClickbox();
         this.addLights();
 
-        this.sceneControls = new SceneController(this.camera, this.renderer, this.renderer.domElement);
+        this.sceneControls = new SceneController(this.camera, this.renderer.domElement);
 
         this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this));
         this.renderer.domElement.addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -70,6 +70,8 @@ class RubikCubeScene {
         this.cubeSideElements = [];
 
         this.brushMaterial;
+
+        this.isAnimating = false;
     }
 
     loadCube() {
@@ -94,7 +96,12 @@ class RubikCubeScene {
                     }
                 });
 
-                this.cubeControls = new RubikCubeController(this.scene, this.cubies, this.centralCubeElement);
+                this.cubeControls = new RubikCubeController(
+                    this.scene,
+                    this.centralCubeElement,
+                    this.cubies,
+                    this.stickers
+                );
             },
             undefined,
             (error) => {
@@ -115,6 +122,8 @@ class RubikCubeScene {
                         this.materials[object.material.name] = object.material;
                     }
                 });
+
+                this.brushMaterial = this.materials["gray"];
             },
             undefined,
             (error) => {
@@ -141,29 +150,34 @@ class RubikCubeScene {
     }
 
     onMouseDown(event) {
-        if (this.mode == "rotating") {
-            const intersects = this.getMouseIntersections(event, this.clickbox);
+        if (!this.isAnimating) {
+            if (this.mode == "rotating") {
+                const intersects = this.getMouseIntersections(event, this.clickbox);
 
-            if (intersects.length > 0) {
-                this.startPoint3D = intersects[0].point.clone();
-                this.startPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
+                if (intersects.length > 0) {
+                    this.startPoint3D = intersects[0].point.clone();
+                    this.startPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
 
-                this.sceneControls.controls.enabled = false;
-                this.isGrabbing = true;
+                    this.sceneControls.controls.enabled = false;
+                    this.isGrabbing = true;
+                }
             }
-        }
-        if (this.mode == "painting") {
-            const intersects = this.getMouseIntersections(event, this.stickers);
 
-            if (intersects.length > 0) {
-                const sticker = intersects[0].object;
-                sticker.material = this.brushMaterial;
+            if (this.mode == "painting") {
+                const intersects = this.getMouseIntersections(event, this.stickers);
+
+                if (intersects.length > 0) {
+                    const sticker = intersects[0].object;
+                    sticker.material = this.brushMaterial;
+
+                    this.sceneControls.controls.enabled = false;
+                }
             }
         }
     }
 
     onMouseMove(event) {
-        if (this.mode == "rotating" && this.isGrabbing && this.centralCubeElement) {
+        if (this.mode == "rotating" && this.isGrabbing) {
             if (!this.isDragging) {
                 this.updateScreenMousePosition(event);
                 const distance = this.screenMousePosition.distanceTo(this.startPoint2D);
@@ -258,9 +272,6 @@ class RubikCubeScene {
     render() {
         this.sceneControls.update();
         this.renderer.render(this.scene, this.camera);
-        if (this.cubeControls) {
-            this.cubeControls.animate();
-        }
     }
 
     updateScreenMousePosition(event) {
@@ -362,12 +373,22 @@ class RubikCubeScene {
         this.mode = mode;
     }
 
-    cubeInteraction(cubeSide, clockwiseDirection) {
-        this.cubeControls.rotateSide(cubeSide, clockwiseDirection);
+    rotateSide(rotationAxis, cubeLayer, clockwiseDirection) {
+        if (!this.isAnimating) {
+            this.isAnimating = true;
+            this.cubeControls.rotateSide(rotationAxis, cubeLayer, clockwiseDirection).then(() => {
+                this.isAnimating = false;
+            });
+        }
     }
 
     scramble() {
-        this.cubeControls.scramble();
+        if (!this.isAnimating) {
+            this.isAnimating = true;
+            this.cubeControls.scramble().then(() => {
+                this.isAnimating = false;
+            });
+        }
     }
 
     setBrushColor(color) {
