@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import SceneController from "./SceneController";
 import RubikCubeController from "./RubikCubeController";
+import RubikCube from "./RubikCube";
 
 class RubikCubeScene {
     constructor() {
@@ -31,6 +32,7 @@ class RubikCubeScene {
         this.addLights();
 
         this.sceneControls = new SceneController(this.camera, this.renderer.domElement);
+        this.rubikCube = new RubikCube();
 
         this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this));
         this.renderer.domElement.addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -123,7 +125,7 @@ class RubikCubeScene {
                     }
                 });
 
-                this.brushMaterial = this.materials["gray"];
+                this.brushMaterial = this.materials["Gray"];
             },
             undefined,
             (error) => {
@@ -150,6 +152,14 @@ class RubikCubeScene {
     }
 
     onMouseDown(event) {
+        // for (let i = 0; i < 54; i++) {
+        //     console.log(this.stickers[i]);
+        //     let worldPosition = new THREE.Vector3();
+        //     this.stickers[i].getWorldPosition(worldPosition);
+        //     if (worldPosition.x > 1.5) {
+        //         console.log(worldPosition);
+        //     }
+        // }
         if (!this.isAnimating) {
             if (this.mode == "rotating") {
                 const intersects = this.getMouseIntersections(event, this.clickbox);
@@ -393,6 +403,10 @@ class RubikCubeScene {
 
     setBrushColor(color) {
         this.brushMaterial = this.materials[color];
+    }
+
+    convertFrom3DCube() {
+        this.rubikCube.convertFrom3DCube(this.stickers);
     }
 }
 

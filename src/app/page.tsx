@@ -44,12 +44,19 @@ const RubikCube = () => {
         }
     };
 
+    const convertFrom3DCube = () => {
+        if (rubikCubeSceneRef.current) {
+            rubikCubeSceneRef.current.convertFrom3DCube();
+        }
+    };
+
     return (
         <div className={styles.column}>
             <div>mode</div>
             <div className={styles.row}>
                 <Button label={"rotate"} onClick={() => changeMode("rotating")} />
                 <Button label={"paint"} onClick={() => changeMode("painting")} />
+                <Button label={"convert"} onClick={() => convertFrom3DCube()} />
             </div>
             <div className={styles.row}>
                 <div className={styles.column}>
@@ -83,28 +90,28 @@ const RubikCube = () => {
                 <div className={styles.column}>
                     <div>Color</div>
                     <div className={styles.row}>
-                        <Button label={""} className={styles.buttonN} onClick={() => setBrushColor("gray")} />
+                        <Button label={""} className={styles.buttonN} onClick={() => setBrushColor("Gray")} />
                         <Button
                             label={""}
                             className={styles.buttonW}
-                            onClick={() => setBrushColor("white")}
+                            onClick={() => setBrushColor("White")}
                         />
                         <Button
                             label={""}
                             className={styles.buttonY}
-                            onClick={() => setBrushColor("yellow")}
+                            onClick={() => setBrushColor("Yellow")}
                         />
-                        <Button label={""} className={styles.buttonR} onClick={() => setBrushColor("red")} />
+                        <Button label={""} className={styles.buttonR} onClick={() => setBrushColor("Red")} />
                         <Button
                             label={""}
                             className={styles.buttonO}
-                            onClick={() => setBrushColor("orange")}
+                            onClick={() => setBrushColor("Orange")}
                         />
-                        <Button label={""} className={styles.buttonB} onClick={() => setBrushColor("blue")} />
+                        <Button label={""} className={styles.buttonB} onClick={() => setBrushColor("Blue")} />
                         <Button
                             label={""}
                             className={styles.buttonG}
-                            onClick={() => setBrushColor("green")}
+                            onClick={() => setBrushColor("Green")}
                         />
                     </div>
                 </div>
