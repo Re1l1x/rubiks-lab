@@ -3,6 +3,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import SceneController from "./SceneController";
 import RubikCubeController from "./RubikCubeController";
 import RubikCube from "./RubikCube";
+import CubieCube from "./CubieCube";
 
 class RubikCubeScene {
     constructor() {
@@ -33,6 +34,7 @@ class RubikCubeScene {
 
         this.sceneControls = new SceneController(this.camera, this.renderer.domElement);
         this.rubikCube = new RubikCube();
+        this.cubieCube = new CubieCube();
 
         this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this));
         this.renderer.domElement.addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -152,20 +154,13 @@ class RubikCubeScene {
     }
 
     onMouseDown(event) {
-        // for (let i = 0; i < 54; i++) {
-        //     console.log(this.stickers[i]);
-        //     let worldPosition = new THREE.Vector3();
-        //     this.stickers[i].getWorldPosition(worldPosition);
-        //     if (worldPosition.x > 1.5) {
-        //         console.log(worldPosition);
-        //     }
-        // }
         if (!this.isAnimating) {
             if (this.mode == "rotating") {
                 const intersects = this.getMouseIntersections(event, this.clickbox);
 
                 if (intersects.length > 0) {
                     this.startPoint3D = intersects[0].point.clone();
+                    console.log(intersects[0].point);
                     this.startPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
 
                     this.sceneControls.controls.enabled = false;
@@ -405,8 +400,12 @@ class RubikCubeScene {
         this.brushMaterial = this.materials[color];
     }
 
+    // convertFrom3DCube() {
+    //     this.rubikCube.convertFrom3DCube(this.stickers);
+    // }
+
     convertFrom3DCube() {
-        this.rubikCube.convertFrom3DCube(this.stickers);
+        this.cubieCube.convertFrom3DCube(this.cubies);
     }
 }
 
