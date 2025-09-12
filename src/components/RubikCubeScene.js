@@ -410,9 +410,14 @@ class RubikCubeScene {
     }
 
     solveCube() {
-        this.cubieCube.convertFrom3DCube(this.cubies);
-        this.ThreePhaseAlgorithm = new ThreePhaseAlgorithm(this.cubieCube);
-        this.cubeControls.player(this.ThreePhaseAlgorithm.solveCube());
+        if (!this.isAnimating) {
+            this.isAnimating = true;
+            this.cubieCube.convertFrom3DCube(this.cubies);
+            this.ThreePhaseAlgorithm = new ThreePhaseAlgorithm(this.cubieCube);
+            this.cubeControls.player(this.ThreePhaseAlgorithm.solveCube()).then(() => {
+                this.isAnimating = false;
+            });
+        }
     }
 }
 

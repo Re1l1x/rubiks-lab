@@ -6,16 +6,18 @@ class ThreePhaseAlgorithm {
     solveCube() {
         let solutionSequence = [];
 
-        solutionSequence = solutionSequence.concat(this.whiteСross());
+        solutionSequence = solutionSequence.concat(this.whiteCross());
         solutionSequence = solutionSequence.concat(this.firstLayer());
         solutionSequence = solutionSequence.concat(this.secondLayer());
         solutionSequence = solutionSequence.concat(this.yellowCross());
         solutionSequence = solutionSequence.concat(this.correctYellowCross());
+        solutionSequence = solutionSequence.concat(this.thirdLayerCornersPosition());
+        solutionSequence = solutionSequence.concat(this.thirdLayerCornersRotation());
 
         return solutionSequence;
     }
 
-    whiteСross() {
+    whiteCross() {
         let sequence = [];
 
         for (let i = 4; i < 8; i++) {
@@ -353,11 +355,216 @@ class ThreePhaseAlgorithm {
             );
         }
 
+        this.cubieCube.player(sequence);
+
         return sequence;
     }
 
     correctYellowCross() {
         let sequence = [];
+
+        let count = 0;
+        let first = -1;
+        let distance = -1;
+        for (let i = 0; i < 4; i++) {
+            let pos = this.cubieCube.cubieCube.edges[i].pos;
+            if (pos == i) {
+                count++;
+                if (first < 0) {
+                    first = i;
+                } else {
+                    distance = i - first;
+                }
+            }
+        }
+
+        while (count < 2) {
+            count = 0;
+            first = -1;
+            distance = -1;
+
+            sequence.push("U");
+            this.cubieCube.player(["U"]);
+
+            for (let i = 0; i < 4; i++) {
+                let pos = this.cubieCube.cubieCube.edges[i].pos;
+                if (pos == i) {
+                    count++;
+                    if (first < 0) {
+                        first = i;
+                    } else {
+                        distance = i - first;
+                    }
+                }
+            }
+        }
+
+        let tempSequence = [];
+        if (count == 2 && distance == 2) {
+            tempSequence.push(
+                ...[
+                    this.convertRotate((first + 3) % 4, true),
+                    "U",
+                    this.convertRotate((first + 3) % 4, false),
+                    "U",
+                    this.convertRotate((first + 3) % 4, true),
+                    "U",
+                    "U",
+                    this.convertRotate((first + 3) % 4, false),
+                    this.convertRotate(first % 4, true),
+                    "U",
+                    this.convertRotate(first % 4, false),
+                    "U",
+                    this.convertRotate(first % 4, true),
+                    "U",
+                    "U",
+                    this.convertRotate(first % 4, false),
+                    "U",
+                ]
+            );
+        } else if (count == 2 && distance % 2 == 1) {
+            if (distance == 3) {
+                first = (first + 3) % 4;
+            }
+            tempSequence.push(
+                ...[
+                    this.convertRotate((first + 1) % 4, true),
+                    "U",
+                    this.convertRotate((first + 1) % 4, false),
+                    "U",
+                    this.convertRotate((first + 1) % 4, true),
+                    "U",
+                    "U",
+                    this.convertRotate((first + 1) % 4, false),
+                    "U",
+                ]
+            );
+        }
+
+        this.cubieCube.player(tempSequence);
+        sequence.push(...tempSequence);
+
+        return sequence;
+    }
+
+    thirdLayerCornersPosition() {
+        let sequence = [];
+
+        let count = 0;
+        let first = -1;
+        for (let i = 0; i < 4; i++) {
+            let pos = this.cubieCube.cubieCube.corners[i].pos;
+
+            if (pos == i) {
+                count++;
+                first = i;
+            }
+        }
+
+        if (count == 0) {
+            sequence.push(
+                ...[
+                    "U",
+                    this.convertRotate(3, true),
+                    "U'",
+                    this.convertRotate(1, false),
+                    "U",
+                    this.convertRotate(3, false),
+                    "U'",
+                    this.convertRotate(1, true),
+                ]
+            );
+            this.cubieCube.player(sequence);
+
+            count = 0;
+            first = -1;
+            for (let i = 0; i < 4; i++) {
+                let pos = this.cubieCube.cubieCube.corners[i].pos;
+
+                if (pos == i) {
+                    count++;
+                    first = i;
+                }
+            }
+        }
+
+        let tempSequence = [];
+        if (count == 1) {
+            tempSequence.push(
+                ...[
+                    "U",
+                    this.convertRotate((first + 3) % 4, true),
+                    "U'",
+                    this.convertRotate((first + 1) % 4, false),
+                    "U",
+                    this.convertRotate((first + 3) % 4, false),
+                    "U'",
+                    this.convertRotate((first + 1) % 4, true),
+                ]
+            );
+            this.cubieCube.player(tempSequence);
+            sequence.push(...tempSequence);
+
+            tempSequence = [];
+            if ((first + 1) % 4 != this.cubieCube.cubieCube.corners[(first + 1) % 4].pos) {
+                tempSequence.push(
+                    ...[
+                        "U",
+                        this.convertRotate((first + 3) % 4, true),
+                        "U'",
+                        this.convertRotate((first + 1) % 4, false),
+                        "U",
+                        this.convertRotate((first + 3) % 4, false),
+                        "U'",
+                        this.convertRotate((first + 1) % 4, true),
+                    ]
+                );
+            }
+        }
+
+        this.cubieCube.player(tempSequence);
+        sequence.push(...tempSequence);
+
+        return sequence;
+    }
+
+    thirdLayerCornersRotation() {
+        let sequence = [];
+
+        for (let i of [1, 0, 3, 2]) {
+            let ori = this.cubieCube.cubieCube.corners[i].ori;
+            if (ori == 1) {
+                sequence.push(
+                    ...[
+                        this.convertRotate(1, true),
+                        "D",
+                        this.convertRotate(1, false),
+                        "D'",
+                        this.convertRotate(1, true),
+                        "D",
+                        this.convertRotate(1, false),
+                        "D'",
+                    ]
+                );
+                ori = 2;
+            }
+            if (ori == 2) {
+                sequence.push(
+                    ...[
+                        this.convertRotate(1, true),
+                        "D",
+                        this.convertRotate(1, false),
+                        "D'",
+                        this.convertRotate(1, true),
+                        "D",
+                        this.convertRotate(1, false),
+                        "D'",
+                    ]
+                );
+            }
+            sequence.push("U");
+        }
+        this.cubieCube.player(sequence);
 
         return sequence;
     }
