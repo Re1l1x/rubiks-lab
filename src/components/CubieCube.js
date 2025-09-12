@@ -172,6 +172,28 @@ class CubieCube {
         return dominant.direction;
     }
 
+    findCorner(pos) {
+        for (let i = 0; i < 8; i++) {
+            if (this.cubieCube.corners[i].pos == pos) {
+                return i;
+            }
+        }
+    }
+
+    findEdge(pos) {
+        for (let i = 0; i < 12; i++) {
+            if (this.cubieCube.edges[i].pos == pos) {
+                return i;
+            }
+        }
+    }
+
+    player(sequence) {
+        for (let i = 0; i < sequence.length; i++) {
+            this.rotateSide(sequence[i]);
+        }
+    }
+
     rotateSide(move) {
         let cornerIndices;
         let edgeIndices;

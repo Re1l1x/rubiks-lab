@@ -4,6 +4,7 @@ import SceneController from "./SceneController";
 import RubikCubeController from "./RubikCubeController";
 import RubikCube from "./RubikCube";
 import CubieCube from "./CubieCube";
+import ThreePhaseAlgorithm from "./Algorithms/ThreePhaseAlgorithm";
 
 class RubikCubeScene {
     constructor() {
@@ -406,6 +407,12 @@ class RubikCubeScene {
 
     convertFrom3DCube() {
         this.cubieCube.convertFrom3DCube(this.cubies);
+    }
+
+    solveCube() {
+        this.cubieCube.convertFrom3DCube(this.cubies);
+        this.ThreePhaseAlgorithm = new ThreePhaseAlgorithm(this.cubieCube);
+        this.cubeControls.player(this.ThreePhaseAlgorithm.solveCube());
     }
 }
 

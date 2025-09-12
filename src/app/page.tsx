@@ -50,6 +50,12 @@ const RubikCube = () => {
         }
     };
 
+    const solveCube = () => {
+        if (rubikCubeSceneRef.current) {
+            rubikCubeSceneRef.current.solveCube();
+        }
+    };
+
     return (
         <div className={styles.column}>
             <div>mode</div>
@@ -57,6 +63,7 @@ const RubikCube = () => {
                 <Button label={"rotate"} onClick={() => changeMode("rotating")} />
                 <Button label={"paint"} onClick={() => changeMode("painting")} />
                 <Button label={"convert"} onClick={() => convertFrom3DCube()} />
+                <Button label={"solve"} onClick={() => solveCube()} />
             </div>
             <div className={styles.row}>
                 <div className={styles.column}>

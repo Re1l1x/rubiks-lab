@@ -22,7 +22,7 @@ class RubikCubeController {
             let lastCubeLayerNum = -1;
             let lastClockwiseDirectionNum = -1;
 
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 10; i++) {
                 let rotationAxisNum, cubeLayerNum, clockwiseDirectionNum;
 
                 do {
@@ -52,6 +52,42 @@ class RubikCubeController {
 
     getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    player(sequence) {
+        console.log(sequence);
+        console.log(sequence.length);
+        return new Promise(async (resolve) => {
+            let rotationAxis, cubeLayer, clockwiseDirection;
+
+            for (let i = 0; i < sequence.length; i++) {
+                if (sequence[i].includes("U")) {
+                    rotationAxis = "y";
+                    cubeLayer = 1;
+                } else if (sequence[i].includes("D")) {
+                    rotationAxis = "y";
+                    cubeLayer = -1;
+                } else if (sequence[i].includes("F")) {
+                    rotationAxis = "x";
+                    cubeLayer = 1;
+                } else if (sequence[i].includes("B")) {
+                    rotationAxis = "x";
+                    cubeLayer = -1;
+                } else if (sequence[i].includes("R")) {
+                    rotationAxis = "z";
+                    cubeLayer = -1;
+                } else if (sequence[i].includes("L")) {
+                    rotationAxis = "z";
+                    cubeLayer = 1;
+                }
+
+                clockwiseDirection = !sequence[i].includes("'");
+
+                await this.rotateSide(rotationAxis, cubeLayer, clockwiseDirection);
+            }
+
+            resolve();
+        });
     }
 
     rotateSide(rotationAxis, cubeLayer, clockwiseDirection) {
