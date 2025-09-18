@@ -2,6 +2,9 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import SceneController from "./SceneController";
 import RubikCubeController from "./RubikCubeController";
+import RubikCube from "./RubikCube";
+import CubieCube from "./CubieCube";
+import ThreePhaseAlgorithm from "./Algorithms/ThreePhaseAlgorithm";
 
 class RubikCubeScene {
     constructor() {
@@ -31,6 +34,8 @@ class RubikCubeScene {
         this.addLights();
 
         this.sceneControls = new SceneController(this.camera, this.renderer.domElement);
+        this.rubikCube = new RubikCube();
+        this.cubieCube = new CubieCube();
 
         this.renderer.domElement.addEventListener("mousedown", this.onMouseDown.bind(this));
         this.renderer.domElement.addEventListener("mousemove", this.onMouseMove.bind(this));
@@ -123,7 +128,7 @@ class RubikCubeScene {
                     }
                 });
 
-                this.brushMaterial = this.materials["gray"];
+                this.brushMaterial = this.materials["Gray"];
             },
             undefined,
             (error) => {
@@ -156,6 +161,7 @@ class RubikCubeScene {
 
                 if (intersects.length > 0) {
                     this.startPoint3D = intersects[0].point.clone();
+                    console.log(intersects[0].point);
                     this.startPoint2D = new THREE.Vector2().copy(this.screenMousePosition);
 
                     this.sceneControls.controls.enabled = false;
@@ -393,6 +399,25 @@ class RubikCubeScene {
 
     setBrushColor(color) {
         this.brushMaterial = this.materials[color];
+    }
+
+    // convertFrom3DCube() {
+    //     this.rubikCube.convertFrom3DCube(this.stickers);
+    // }
+
+    convertFrom3DCube() {
+        this.cubieCube.convertFrom3DCube(this.cubies);
+    }
+
+    solveCube() {
+        if (!this.isAnimating) {
+            this.isAnimating = true;
+            this.cubieCube.convertFrom3DCube(this.cubies);
+            this.ThreePhaseAlgorithm = new ThreePhaseAlgorithm(this.cubieCube);
+            this.cubeControls.player(this.ThreePhaseAlgorithm.solveCube()).then(() => {
+                this.isAnimating = false;
+            });
+        }
     }
 }
 
