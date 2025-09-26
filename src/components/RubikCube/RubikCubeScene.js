@@ -4,7 +4,7 @@ import SceneController from "./SceneController";
 import RubikCubeController from "./RubikCubeController";
 import RubikCube from "./RubikCube";
 import CubieCube from "./CubieCube";
-import ThreePhaseAlgorithm from "./Algorithms/ThreePhaseAlgorithm";
+import ThreePhaseAlgorithm from "@/components/Algorithms/ThreePhaseAlgorithm";
 
 class RubikCubeScene {
     constructor() {
