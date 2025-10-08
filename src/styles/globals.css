@@ -1,11 +1,57 @@
 :root {
-    --accent: var(--sexy-blue);
-    --dark-accent: var(--dark-green);
+    --white-50: #1c2024;
+    --white-100: #60646c;
+    --white-200: #80838d;
+    --white-300: #8b8d98;
+    --white-400: #b9bbc6;
+    --white-500: #cdced6;
+    --white-600: #d9d9e0;
+    --white-700: #e0e1e6;
+    --white-800: #e8e8ec;
+    --white-900: #f0f0f3;
+    --white-950: #f9f9fb;
 
-    --black: #09090b;
-    --white: #fafafa;
-    --dark-green: #315a31;
-    --sexy-blue: #58d8c9;
+    --black-50: #edeef0;
+    --black-100: #b0b4ba;
+    --black-200: #777b84;
+    --black-300: #696e77;
+    --black-400: #5a6169;
+    --black-500: #43484e;
+    --black-600: #363a3f;
+    --black-700: #2e3135;
+    --black-800: #272a2d;
+    --black-900: #212225;
+    --black-950: #18191b;
+
+    --blue-50: #76ceff;
+    --blue-100: #68c9ff;
+    --blue-200: #59c4ff;
+    --blue-300: #48beff;
+    --blue-400: #36a9ff;
+    --blue-500: #2494ff;
+    --blue-600: #127fff;
+    --blue-700: #0069ff;
+    --blue-800: #005fe8;
+    --blue-900: #0056d3;
+    --blue-950: #004ec0;
+}
+
+html.light {
+    --accent-color: var(--blue-700);
+    --background-color: var(--white-700);
+    --foreground-color: var(--white-900);
+    --border-color: var(--white);
+    --text-color: var(--white-100);
+    --text-muted-color: var(--white-200);
+}
+
+html.dark {
+    --accent-color: var(--blue-700);
+    --background-color: var(--black-900);
+    --foreground-color: var(--black-800);
+    --border-color: var(--black-600);
+    --text-color: var(--white-950);
+    --text-muted-color: var(--white-400);
 }
 
 * {
@@ -15,5 +61,7 @@
 body {
     display: block;
 
-    background-color: var(--black);
+    margin: 0;
+
+    background-color: var(--background-color);
 }

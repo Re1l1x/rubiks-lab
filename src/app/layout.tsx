@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Red_Hat_Text } from "next/font/google";
+import ThemeProvider from "@/components/ThemeProvider";
 import "@/styles/globals.css";
 
 const redhattext = Red_Hat_Text({ subsets: ["latin"] });
@@ -15,8 +16,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
-            <body className={redhattext.className}>{children}</body>
+        <html lang="en" suppressHydrationWarning>
+            <body className={redhattext.className}>
+                <ThemeProvider>
+                    {children}
+                </ThemeProvider>
+            </body>
         </html>
     );
 }
