@@ -1,0 +1,69 @@
+.buttonN {
+    height: 40px;
+    min-width: 40px;
+    padding: 0 17px;
+
+    background-color: #3c3c3cff;
+}
+
+.buttonW {
+    height: 40px;
+    min-width: 40px;
+    padding: 0 17px;
+
+    background-color: #e7e7e7ff;
+}
+
+.buttonY {
+    height: 40px;
+    min-width: 40px;
+    padding: 0 17px;
+
+    background-color: #fff800ff;
+}
+
+.buttonR {
+    height: 40px;
+    min-width: 40px;
+    padding: 0 17px;
+
+    background-color: #ff0000ff;
+}
+
+.buttonO {
+    height: 40px;
+    min-width: 40px;
+    padding: 0 17px;
+
+    background-color: #ff4f00ff;
+}
+
+.buttonB {
+    height: 40px;
+    min-width: 40px;
+    padding: 0 17px;
+
+    background-color: #0000ffff;
+}
+
+.buttonG {
+    height: 40px;
+    min-width: 40px;
+    padding: 0 17px;
+
+    background-color: #00ff00ff;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+
+    margin: 10px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+
+    gap: 10px;
+}

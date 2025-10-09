@@ -1,26 +1,57 @@
 :root {
-    --accent: var(--sexy-blue);
-    --dark-accent: var(--dark-green);
+    --white-50: #1c2024;
+    --white-100: #60646c;
+    --white-200: #80838d;
+    --white-300: #8b8d98;
+    --white-400: #b9bbc6;
+    --white-500: #cdced6;
+    --white-600: #d9d9e0;
+    --white-700: #e0e1e6;
+    --white-800: #e8e8ec;
+    --white-900: #f0f0f3;
+    --white-950: #f9f9fb;
 
-    --black: #09090b;
-    --dark-gray: #18181b;
-    --gray: #27272a;
-    --light-gray: #434343;
-    --dark-white: #9198a1;
-    --white: #fafafa;
+    --black-50: #edeef0;
+    --black-100: #b0b4ba;
+    --black-200: #777b84;
+    --black-300: #696e77;
+    --black-400: #5a6169;
+    --black-500: #43484e;
+    --black-600: #363a3f;
+    --black-700: #2e3135;
+    --black-800: #272a2d;
+    --black-900: #212225;
+    --black-950: #18191b;
 
-    --lime: #bdf500;
-    --green: #7bff78;
-    --dark-green: #315a31;
-    --blue: #366efe;
-    --sexy-blue: #58d8c9;
-    --dark-sexy-blue: #286a62;
-    --red: #ef5d5d;
+    --blue-50: #76ceff;
+    --blue-100: #68c9ff;
+    --blue-200: #59c4ff;
+    --blue-300: #48beff;
+    --blue-400: #36a9ff;
+    --blue-500: #2494ff;
+    --blue-600: #127fff;
+    --blue-700: #0069ff;
+    --blue-800: #005fe8;
+    --blue-900: #0056d3;
+    --blue-950: #004ec0;
+}
 
-    --string: var(--accent);
-    --gym: var(--red);
-    --swimming-pool: var(--sexy-blue);
-    --run: var(--green);
+html.light {
+    --accent-color: var(--blue-700);
+    --background-color: var(--white-800);
+    --foreground-color: var(--white-950);
+    --border-color: var(--white-500);
+    --text-color: var(--black-950);
+    --text-muted-color: var(--black-200);
+}
+
+html.dark {
+    --accent-color: var(--blue-700);
+    --background-color: var(--black-900);
+    --foreground-color: var(--black-800);
+    --border-color: var(--black-600);
+    --text-color: var(--white-950);
+    --text-muted-color: var(--white-300);
 }
 
 * {
@@ -29,4 +60,8 @@
 
 body {
     display: block;
+
+    margin: 0;
+
+    background-color: var(--background-color);
 }
