@@ -38,11 +38,11 @@
 
 html.light {
     --accent-color: var(--blue-700);
-    --background-color: var(--white-700);
-    --foreground-color: var(--white-900);
-    --border-color: var(--white);
-    --text-color: var(--white-100);
-    --text-muted-color: var(--white-200);
+    --background-color: var(--white-800);
+    --foreground-color: var(--white-950);
+    --border-color: var(--white-500);
+    --text-color: var(--black-950);
+    --text-muted-color: var(--black-200);
 }
 
 html.dark {
@@ -51,7 +51,7 @@ html.dark {
     --foreground-color: var(--black-800);
     --border-color: var(--black-600);
     --text-color: var(--white-950);
-    --text-muted-color: var(--white-400);
+    --text-muted-color: var(--white-300);
 }
 
 * {
