@@ -65,3 +65,11 @@ body {
 
     background-color: var(--background-color);
 }
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: calc(100vh - 50px);
+}
