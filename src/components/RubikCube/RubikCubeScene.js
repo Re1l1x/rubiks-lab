@@ -4,26 +4,32 @@ import SceneController from "./SceneController";
 import RubikCubeController from "./RubikCubeController";
 import RubikCube from "./RubikCube";
 import CubieCube from "./CubieCube";
-import ThreePhaseAlgorithm from "@/components/Algorithms/ThreePhaseAlgorithm";
+import ThreePhaseAlgorithm from "@/components/RubikCube/Algorithms/ThreePhaseAlgorithm";
 
 class RubikCubeScene {
-    constructor() {
+    constructor(container) {
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera = new THREE.PerspectiveCamera(
+            75,
+            container.clientWidth / container.clientHeight,
+            0.1,
+            1000
+        );
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.raycaster = new THREE.Raycaster();
 
         this.sensitivity = 7;
         this.mode = "rotating";
 
-        this.init();
+        this.init(container);
     }
 
-    init() {
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(this.renderer.domElement);
+    init(container) {
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        container.appendChild(this.renderer.domElement);
+        // document.body.appendChild(this.renderer.domElement);
 
-        this.scene.background = new THREE.Color(0x7e7e7e);
+        this.scene.background = new THREE.Color(0x272a2d);
 
         this.camera.position.set(5, 3, 5);
         this.camera.lookAt(0, 0, 0);

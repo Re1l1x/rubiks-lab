@@ -21,7 +21,7 @@ export default function RootLayout({
             <body className={redhattext.className}>
                 <ThemeProvider>
                     <Header />
-                    {children}
+                    <div className="content">{children}</div>
                 </ThemeProvider>
             </body>
         </html>

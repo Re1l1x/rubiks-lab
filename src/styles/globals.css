@@ -43,6 +43,10 @@ html.light {
     --border-color: var(--white-500);
     --text-color: var(--black-950);
     --text-muted-color: var(--black-200);
+
+    --container-background-color: var(--white-900);
+    --container-top-color: var(--white-950);
+    --container-button-color: var(--white-800);
 }
 
 html.dark {
@@ -52,6 +56,10 @@ html.dark {
     --border-color: var(--black-600);
     --text-color: var(--white-950);
     --text-muted-color: var(--white-300);
+
+    --container-background-color: var(--black-800);
+    --container-top-color: var(--black-700);
+    --container-button-color: var(--black-600);
 }
 
 * {
@@ -64,4 +72,12 @@ body {
     margin: 0;
 
     background-color: var(--background-color);
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    height: calc(100vh - 50px);
 }
