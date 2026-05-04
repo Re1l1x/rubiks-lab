@@ -95,12 +95,22 @@ class ThreePhaseAlgorithm {
         let sequence = [];
 
         for (let i = 4; i < 8; i++) {
+            sequence.push(...this.firstLayerForSlot(i));
+        }
+
+        return sequence;
+    }
+
+    firstLayerForSlot(i) {
+        let sequence = [];
+
+        {
             let tempSequence = [];
             let index = this.cubieCube.findCorner(i);
             let ori = this.cubieCube.cubieCube.corners[index].ori;
 
             if (index == i && ori == 0) {
-                continue;
+                return sequence;
             }
 
             if (index > 3 && index % 4 != i % 4) {
@@ -196,12 +206,22 @@ class ThreePhaseAlgorithm {
         let sequence = [];
 
         for (let i = 8; i < 12; i++) {
+            sequence.push(...this.secondLayerForSlot(i));
+        }
+
+        return sequence;
+    }
+
+    secondLayerForSlot(i) {
+        let sequence = [];
+
+        {
             let tempSequence = [];
             let index = this.cubieCube.findEdge(i);
             let ori = this.cubieCube.cubieCube.edges[index].ori;
 
             if (i == index && ori == 0) {
-                continue;
+                return sequence;
             }
 
             if (index > 7) {
