@@ -5,6 +5,8 @@ import RubikCubeController from "./RubikCubeController";
 import RubikCube from "./RubikCube";
 import CubieCube from "./CubieCube";
 import ThreePhaseAlgorithm from "@/components/RubikCube/Algorithms/ThreePhaseAlgorithm";
+import FridrichAlgorithm from "@/components/RubikCube/Algorithms/FridrichAlgorithm";
+import CubeValidator from "@/components/RubikCube/Algorithms/CubeValidator";
 
 class RubikCubeScene {
     constructor(container) {
@@ -385,6 +387,10 @@ class RubikCubeScene {
         this.mode = mode;
     }
 
+    setRotationSpeed(speed) {
+        this.cubeControls.setRotationSpeed(speed);
+    }
+
     rotateSide(rotationAxis, cubeLayer, clockwiseDirection) {
         if (!this.isAnimating) {
             this.isAnimating = true;
@@ -415,12 +421,18 @@ class RubikCubeScene {
         this.cubieCube.convertFrom3DCube(this.cubies);
     }
 
-    solveCube() {
+    solveCube(algorithmName = "layerByLayer") {
         if (!this.isAnimating) {
             this.isAnimating = true;
             this.cubieCube.convertFrom3DCube(this.cubies);
-            this.ThreePhaseAlgorithm = new ThreePhaseAlgorithm(this.cubieCube);
-            this.cubeControls.player(this.ThreePhaseAlgorithm.solveCube()).then(() => {
+            const Algorithm = algorithmName === "fridrich" ? FridrichAlgorithm : ThreePhaseAlgorithm;
+            const algorithm = new Algorithm(this.cubieCube);
+            this.cubeControls.player(algorithm.solveCube()).then(() => {
+                // Validate cube state after solving
+                const validation = CubeValidator.validate(this.cubieCube);
+                console.log("=== CUBE STATE VALIDATION ===");
+                console.log(validation.summary);
+                console.log("Details:", validation);
                 this.isAnimating = false;
             });
         }

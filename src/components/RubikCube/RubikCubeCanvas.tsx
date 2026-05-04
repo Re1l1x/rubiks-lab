@@ -1,15 +1,23 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import RubikCubeScene from "./RubikCubeScene";
 
-export default function RubikCubeCanvas() {
+export interface RubikCubeCanvasRef {
+    solve: (algorithmName: "layerByLayer" | "fridrich") => void;
+    scramble: () => void;
+    setRotationSpeed: (speed: number) => void;
+}
+
+const RubikCubeCanvas = forwardRef<RubikCubeCanvasRef>((_, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const sceneRef = useRef<RubikCubeScene | null>(null);
 
     useEffect(() => {
         if (!containerRef.current) return;
 
         const cubeScene = new RubikCubeScene(containerRef.current);
+        sceneRef.current = cubeScene;
         containerRef.current.appendChild(cubeScene.renderer.domElement);
 
         const animate = () => {
@@ -36,6 +44,24 @@ export default function RubikCubeCanvas() {
         };
     }, []);
 
+    useImperativeHandle(ref, () => ({
+        solve: (algorithmName: "layerByLayer" | "fridrich") => {
+            if (sceneRef.current) {
+                sceneRef.current.solveCube(algorithmName);
+            }
+        },
+        scramble: () => {
+            if (sceneRef.current) {
+                sceneRef.current.scramble();
+            }
+        },
+        setRotationSpeed: (speed: number) => {
+            if (sceneRef.current) {
+                sceneRef.current.setRotationSpeed(speed);
+            }
+        },
+    }));
+
     return (
         <div
             ref={containerRef}
@@ -49,4 +75,8 @@ export default function RubikCubeCanvas() {
             }}
         />
     );
-}
+});
+
+RubikCubeCanvas.displayName = "RubikCubeCanvas";
+
+export default RubikCubeCanvas;

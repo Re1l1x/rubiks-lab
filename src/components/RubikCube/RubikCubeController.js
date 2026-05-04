@@ -54,6 +54,10 @@ class RubikCubeController {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    setRotationSpeed(speed) {
+        this.rotationSpeed = speed;
+    }
+
     player(sequence) {
         console.log(sequence);
         console.log(sequence.length);
@@ -104,10 +108,23 @@ class RubikCubeController {
                     (cubeLayer == -1 ? 1 : -1) * (clockwiseDirection ? 1 : -1) * (Math.PI / 2);
 
                 const animateLoop = () => {
+                    const increment =
+                        (cubeLayer == -1 ? 1 : -1) * (clockwiseDirection ? 1 : -1) * this.rotationSpeed;
+                    const nextRotation = this.currentRotation + increment;
+
+                    // Clamp to target to prevent overshoot
+                    if (
+                        (increment > 0 && nextRotation > this.targetRotation) ||
+                        (increment < 0 && nextRotation < this.targetRotation)
+                    ) {
+                        this.currentRotation = this.targetRotation;
+                    } else {
+                        this.currentRotation = nextRotation;
+                    }
+
+                    this.centralCubeElement.rotation[rotationAxis] = this.currentRotation;
+
                     if (Math.abs(this.currentRotation - this.targetRotation) > 0.01) {
-                        this.currentRotation +=
-                            (cubeLayer == -1 ? 1 : -1) * (clockwiseDirection ? 1 : -1) * this.rotationSpeed;
-                        this.centralCubeElement.rotation[rotationAxis] = this.currentRotation;
                         requestAnimationFrame(animateLoop);
                     } else {
                         this.cubies.forEach((element) => {

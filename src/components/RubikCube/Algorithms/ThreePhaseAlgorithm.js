@@ -378,10 +378,12 @@ class ThreePhaseAlgorithm {
             }
         }
 
-        while (count < 2) {
+        let rotationCount = 0;
+        while (count < 2 && rotationCount < 12) {
             count = 0;
             first = -1;
             distance = -1;
+            rotationCount++;
 
             sequence.push("U");
             this.cubieCube.player(["U"]);
