@@ -22,7 +22,7 @@ class RubikCubeController {
             let lastCubeLayerNum = -1;
             let lastClockwiseDirectionNum = -1;
 
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 30; i++) {
                 let rotationAxisNum, cubeLayerNum, clockwiseDirectionNum;
 
                 do {
