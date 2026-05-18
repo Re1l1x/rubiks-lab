@@ -63,7 +63,7 @@ classDiagram
     }
 
     class CubieCube {
-        +cubieCube : {corners, edges}
+        +cubieCube
         -cornerCoords
         -edgeCoords
         -cornerColorTable
