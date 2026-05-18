@@ -7,7 +7,7 @@ export const metadata = {
 const Developers = () => {
     return (
         <div className={styles.page}>
-            <div className={styles.content}>
+            <div className={`${styles.content} ${styles.centered}`}>
                 <h1 className={styles.title}>О разработчиках</h1>
                 <div className={styles.body}>
                     <p>Самарский университет</p>

@@ -109,6 +109,11 @@ class RubikCubeScene {
                     }
                 });
 
+                this.cube.updateMatrixWorld(true);
+                this.stickers.forEach((sticker) => {
+                    sticker.userData.color = this.getStickerFace(sticker);
+                });
+
                 this.cubeControls = new RubikCubeController(
                     this.scene,
                     this.centralCubeElement,
@@ -411,6 +416,37 @@ class RubikCubeScene {
 
     setBrushColor(color) {
         this.brushMaterial = this.materials[color];
+    }
+
+    getStickerFace(sticker) {
+        const pos = new THREE.Vector3();
+        sticker.getWorldPosition(pos);
+        const ax = Math.abs(pos.x);
+        const ay = Math.abs(pos.y);
+        const az = Math.abs(pos.z);
+        if (ay >= ax && ay >= az) return pos.y > 0 ? "U" : "D";
+        if (ax >= ay && ax >= az) return pos.x > 0 ? "F" : "B";
+        return pos.z > 0 ? "L" : "R";
+    }
+
+    setFaceColor(colorId, hexColor) {
+        if (!this.stickers || this.stickers.length === 0) return;
+        const baseMaterial = Object.values(this.materials)[0];
+        const newMat = baseMaterial ? baseMaterial.clone() : new THREE.MeshStandardMaterial();
+        newMat.color = new THREE.Color(hexColor);
+        newMat.name = `Custom_${colorId}`;
+
+        this.stickers.forEach((sticker) => {
+            if (sticker.userData.color === colorId) {
+                sticker.material = newMat;
+            }
+        });
+    }
+
+    applyPalette(palette) {
+        ["U", "D", "F", "B", "L", "R"].forEach((colorId) => {
+            if (palette[colorId]) this.setFaceColor(colorId, palette[colorId]);
+        });
     }
 
     // convertFrom3DCube() {

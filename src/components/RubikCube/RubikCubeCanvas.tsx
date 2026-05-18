@@ -3,10 +3,15 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from "react";
 import RubikCubeScene from "./RubikCubeScene";
 
+export type CubeFace = "U" | "D" | "F" | "B" | "L" | "R";
+export type CubePalette = Record<CubeFace, string>;
+
 export interface RubikCubeCanvasRef {
     solve: (algorithmName: "layerByLayer" | "fridrich") => void;
     scramble: () => void;
     setRotationSpeed: (speed: number) => void;
+    setFaceColor: (face: CubeFace, hexColor: string) => void;
+    applyPalette: (palette: CubePalette) => void;
 }
 
 const RubikCubeCanvas = forwardRef<RubikCubeCanvasRef>((_, ref) => {
@@ -58,6 +63,16 @@ const RubikCubeCanvas = forwardRef<RubikCubeCanvasRef>((_, ref) => {
         setRotationSpeed: (speed: number) => {
             if (sceneRef.current) {
                 sceneRef.current.setRotationSpeed(speed);
+            }
+        },
+        setFaceColor: (face: CubeFace, hexColor: string) => {
+            if (sceneRef.current) {
+                sceneRef.current.setFaceColor(face, hexColor);
+            }
+        },
+        applyPalette: (palette: CubePalette) => {
+            if (sceneRef.current) {
+                sceneRef.current.applyPalette(palette);
             }
         },
     }));

@@ -1,7 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import RubikCubeCanvas, { RubikCubeCanvasRef } from "@/components/RubikCube/RubikCubeCanvas";
+import RubikCubeCanvas, {
+    RubikCubeCanvasRef,
+    CubeFace,
+    CubePalette,
+} from "@/components/RubikCube/RubikCubeCanvas";
+import CubeRecolor from "@/components/CubeRecolor/CubeRecolor";
 import styles from "./page.module.css";
 
 type AlgorithmType = "layerByLayer" | "fridrich";
@@ -11,6 +16,7 @@ const Home = () => {
     const [selectedMethod, setSelectedMethod] = useState<AlgorithmType>("layerByLayer");
     const [isSolving, setIsSolving] = useState(false);
     const [speed, setSpeed] = useState(1);
+    const [isRecolorOpen, setIsRecolorOpen] = useState(false);
 
     const handleScramble = () => {
         if (canvasRef.current && !isSolving) {
@@ -111,6 +117,19 @@ const Home = () => {
                 </div>
 
                 <div className={styles.section}>
+                    <div className={styles.label}>Внешний вид</div>
+                    <div className={styles.buttons}>
+                        <button
+                            className={styles.button}
+                            onClick={() => setIsRecolorOpen(true)}
+                            disabled={isSolving}
+                        >
+                            Перекрасить кубик
+                        </button>
+                    </div>
+                </div>
+
+                <div className={styles.section}>
                     <div className={styles.label}>Информация</div>
                     <div className={styles.buttons}>
                         <a
@@ -136,6 +155,18 @@ const Home = () => {
             <div className={styles.container}>
                 <RubikCubeCanvas ref={canvasRef} />
             </div>
+
+            {isRecolorOpen && (
+                <CubeRecolor
+                    onClose={() => setIsRecolorOpen(false)}
+                    onApplyFace={(face: CubeFace, hex: string) =>
+                        canvasRef.current?.setFaceColor(face, hex)
+                    }
+                    onApplyPalette={(palette: CubePalette) =>
+                        canvasRef.current?.applyPalette(palette)
+                    }
+                />
+            )}
         </div>
     );
 };
