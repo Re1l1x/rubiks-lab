@@ -17,13 +17,13 @@ const Header = () => {
             </div>
             <div className={styles.navbar}>
                 <div className={`${styles.navItem} ${pathname === "/education" ? styles.active : ""}`}>
-                    <Link href="/education">Education</Link>
+                    <Link href="/education">Обучение</Link>
                 </div>
                 <div className={`${styles.navItem} ${pathname === "/introduction" ? styles.active : ""}`}>
-                    <Link href="/introduction">Introduction</Link>
+                    <Link href="/introduction">Введение</Link>
                 </div>
                 <div className={`${styles.navItem} ${pathname === "/test" ? styles.active : ""}`}>
-                    <Link href="/test">Test</Link>
+                    <Link href="/test">Тест</Link>
                 </div>
             </div>
         </div>

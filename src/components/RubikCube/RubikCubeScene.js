@@ -5,6 +5,8 @@ import RubikCubeController from "./RubikCubeController";
 import RubikCube from "./RubikCube";
 import CubieCube from "./CubieCube";
 import ThreePhaseAlgorithm from "@/components/RubikCube/Algorithms/ThreePhaseAlgorithm";
+import FridrichAlgorithm from "@/components/RubikCube/Algorithms/FridrichAlgorithm";
+import CubeValidator from "@/components/RubikCube/Algorithms/CubeValidator";
 
 class RubikCubeScene {
     constructor(container) {
@@ -105,6 +107,11 @@ class RubikCubeScene {
                     } else {
                         this.cubies.push(object);
                     }
+                });
+
+                this.cube.updateMatrixWorld(true);
+                this.stickers.forEach((sticker) => {
+                    sticker.userData.color = this.getStickerFace(sticker);
                 });
 
                 this.cubeControls = new RubikCubeController(
@@ -385,6 +392,10 @@ class RubikCubeScene {
         this.mode = mode;
     }
 
+    setRotationSpeed(speed) {
+        this.cubeControls.setRotationSpeed(speed);
+    }
+
     rotateSide(rotationAxis, cubeLayer, clockwiseDirection) {
         if (!this.isAnimating) {
             this.isAnimating = true;
@@ -407,6 +418,37 @@ class RubikCubeScene {
         this.brushMaterial = this.materials[color];
     }
 
+    getStickerFace(sticker) {
+        const pos = new THREE.Vector3();
+        sticker.getWorldPosition(pos);
+        const ax = Math.abs(pos.x);
+        const ay = Math.abs(pos.y);
+        const az = Math.abs(pos.z);
+        if (ay >= ax && ay >= az) return pos.y > 0 ? "U" : "D";
+        if (ax >= ay && ax >= az) return pos.x > 0 ? "F" : "B";
+        return pos.z > 0 ? "L" : "R";
+    }
+
+    setFaceColor(colorId, hexColor) {
+        if (!this.stickers || this.stickers.length === 0) return;
+        const baseMaterial = Object.values(this.materials)[0];
+        const newMat = baseMaterial ? baseMaterial.clone() : new THREE.MeshStandardMaterial();
+        newMat.color = new THREE.Color(hexColor);
+        newMat.name = `Custom_${colorId}`;
+
+        this.stickers.forEach((sticker) => {
+            if (sticker.userData.color === colorId) {
+                sticker.material = newMat;
+            }
+        });
+    }
+
+    applyPalette(palette) {
+        ["U", "D", "F", "B", "L", "R"].forEach((colorId) => {
+            if (palette[colorId]) this.setFaceColor(colorId, palette[colorId]);
+        });
+    }
+
     // convertFrom3DCube() {
     //     this.rubikCube.convertFrom3DCube(this.stickers);
     // }
@@ -415,12 +457,18 @@ class RubikCubeScene {
         this.cubieCube.convertFrom3DCube(this.cubies);
     }
 
-    solveCube() {
+    solveCube(algorithmName = "layerByLayer") {
         if (!this.isAnimating) {
             this.isAnimating = true;
             this.cubieCube.convertFrom3DCube(this.cubies);
-            this.ThreePhaseAlgorithm = new ThreePhaseAlgorithm(this.cubieCube);
-            this.cubeControls.player(this.ThreePhaseAlgorithm.solveCube()).then(() => {
+            const Algorithm = algorithmName === "fridrich" ? FridrichAlgorithm : ThreePhaseAlgorithm;
+            const algorithm = new Algorithm(this.cubieCube);
+            this.cubeControls.player(algorithm.solveCube()).then(() => {
+                // Validate cube state after solving
+                const validation = CubeValidator.validate(this.cubieCube);
+                console.log("=== CUBE STATE VALIDATION ===");
+                console.log(validation.summary);
+                console.log("Details:", validation);
                 this.isAnimating = false;
             });
         }

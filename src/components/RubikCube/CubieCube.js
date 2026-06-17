@@ -125,7 +125,7 @@ class CubieCube {
     }
 
     findPos(stickers, table) {
-        let colors = stickers.map((sticker) => this.colorMap[sticker.material.name]).sort();
+        let colors = stickers.map((sticker) => sticker.userData.color).sort();
         for (let i = 0; i < table.length; i++) {
             if (JSON.stringify(colors) == JSON.stringify(table[i].slice().sort())) {
                 return i;
@@ -146,10 +146,10 @@ class CubieCube {
             stickers[i].getWorldPosition(worldPosition);
             // console.log(this.getDominantDirection(worldPosition), referenceDirection);
             if (this.getDominantDirection(worldPosition) == referenceDirection) {
-                // console.log(this.colorMap[stickers[i].material.name], table[pos]);
+                // console.log(stickers[i].userData.color, table[pos]);
                 for (let j = 0; j < table[pos].length; j++) {
-                    // console.log(this.colorMap[stickers[i].material.name], table[pos][j]);
-                    if (this.colorMap[stickers[i].material.name] == table[pos][j]) {
+                    // console.log(stickers[i].userData.color, table[pos][j]);
+                    if (stickers[i].userData.color == table[pos][j]) {
                         return j;
                     }
                 }
